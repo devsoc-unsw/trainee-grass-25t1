@@ -5,8 +5,8 @@ export async function getUserById(id: string) {
   // Prisma Queries
   return await prisma.user.findUnique({
     where: {
-      id: id
-    }
+      id: id,
+    },
   });
 }
 
@@ -14,8 +14,8 @@ export async function getUserByEmail(email: string) {
   // Prisma Queries
   return await prisma.user.findUnique({
     where: {
-      email: email
-    }
+      email: email,
+    },
   });
 }
 
@@ -23,7 +23,7 @@ export async function getUserByUsername(username: string) {
   // Prisma Queries
   return await prisma.user.findUnique({
     where: {
-      username: username
-    }
+      username: username,
+    },
   });
 }

@@ -4,30 +4,43 @@ import { PrismaClient } from "@prisma/client";
 const prisma = new PrismaClient();
 
 export async function checkEmailExists(email: string): Promise<boolean> {
-  const res = await prisma.user.findFirst({
-    where: {
-      email: email
-    }
-  }).catch(e => { console.error(e.message) })
+  const res = await prisma.user
+    .findFirst({
+      where: {
+        email: email,
+      },
+    })
+    .catch((e) => {
+      console.error(e.message);
+    });
 
-  if (res === null) return false; else return true;
+  if (res === null) return false;
+  else return true;
 }
 
 export async function checkUsernameExists(username: string): Promise<boolean> {
-  const res = await prisma.user.findFirst({
-    where: {
-      username: username
-    }
-  }).catch(e => { console.error(e.message) })
+  const res = await prisma.user
+    .findFirst({
+      where: {
+        username: username,
+      },
+    })
+    .catch((e) => {
+      console.error(e.message);
+    });
 
-  if (res === null) return false; else return true;
+  if (res === null) return false;
+  else return true;
 }
 
-export async function verifyLogin(email: string, password: string): Promise<boolean> {
+export async function verifyLogin(
+  email: string,
+  password: string
+): Promise<boolean> {
   const user = await prisma.user.findFirst({
     where: {
-      email: email
-    }
+      email: email,
+    },
   });
 
   if (user === null) return false;
@@ -37,24 +50,24 @@ export async function verifyLogin(email: string, password: string): Promise<bool
   if (user.password === getHash(password)) {
     await prisma.user.update({
       where: {
-        email: email
+        email: email,
       },
       data: {
-        remainingLoginAttempts: 3
-      }
+        remainingLoginAttempts: 3,
+      },
     });
 
     return true;
   } else {
     await prisma.user.update({
       where: {
-        email: email
+        email: email,
       },
       data: {
         remainingLoginAttempts: {
-          decrement: 1
-        }
-      }
+          decrement: 1,
+        },
+      },
     });
 
     return false;
@@ -64,11 +77,12 @@ export async function verifyLogin(email: string, password: string): Promise<bool
 export async function checkBlockedAccount(email: string): Promise<boolean> {
   const user = await prisma.user.findFirst({
     where: {
-      email: email
-    }
+      email: email,
+    },
   });
 
   if (user === null) return false;
 
-  if (user.remainingLoginAttempts === 0) return true; else return false;
+  if (user.remainingLoginAttempts === 0) return true;
+  else return false;
 }
