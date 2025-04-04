@@ -36,6 +36,8 @@ app.use(
 
 const PORT: number = parseInt(process.env.PORT || "3000");
 const isProduction: boolean = process.env.NODE_ENV === "production";
+const COOKIES_SAME_SITE = COOKIES_SAME_SITE;
+const COOKIES_DOMAIN = isProduction ? "" : ".localhost"; // TODO: COOKIES DOMAIN FOR DEPLOYMENT
 
 ///////////////////////// ROUTES /////////////////////////
 
@@ -59,16 +61,16 @@ app.post("/auth/register", async (req: Request, res: Response) => {
       httpOnly: isProduction,
       path: "/",
       secure: isProduction,
-      sameSite: isProduction ? "none" : "lax",
-      domain: isProduction ? "studysync.denzeliskandar.com" : ".localhost",
+      sameSite: COOKIES_SAME_SITE,
+      domain: COOKIES_DOMAIN,
       maxAge: 1800000,
     });
     res.cookie("refreshToken", refreshToken, {
       httpOnly: isProduction,
       path: "/",
       secure: isProduction,
-      sameSite: isProduction ? "none" : "lax",
-      domain: isProduction ? "studysync.denzeliskandar.com" : ".localhost",
+      sameSite: COOKIES_SAME_SITE,
+      domain: COOKIES_DOMAIN,
       maxAge: 7776000000,
     });
 
@@ -96,16 +98,16 @@ app.post("/auth/login", async (req: Request, res: Response) => {
       httpOnly: isProduction,
       path: "/",
       secure: isProduction,
-      sameSite: isProduction ? "none" : "lax",
-      domain: isProduction ? "studysync.denzeliskandar.com" : ".localhost",
+      sameSite: COOKIES_SAME_SITE,
+      domain: COOKIES_DOMAIN,
       maxAge: 1800000,
     });
     res.cookie("refreshToken", refreshToken, {
       httpOnly: isProduction,
       path: "/",
       secure: isProduction,
-      sameSite: isProduction ? "none" : "lax",
-      domain: isProduction ? "studysync.denzeliskandar.com" : ".localhost",
+      sameSite: COOKIES_SAME_SITE,
+      domain: COOKIES_DOMAIN,
       maxAge: 7776000000,
     });
 
@@ -133,10 +135,10 @@ app.post(
 
       // Assign cookies
       res.clearCookie("accessToken", {
-        domain: isProduction ? "studysync.denzeliskandar.com" : ".localhost",
+        domain: COOKIES_DOMAIN,
       });
       res.clearCookie("refreshToken", {
-        domain: isProduction ? "studysync.denzeliskandar.com" : ".localhost",
+        domain: COOKIES_DOMAIN,
       });
 
       res.sendStatus(200);
@@ -227,16 +229,16 @@ async function authenticateToken(
           httpOnly: isProduction,
           path: "/",
           secure: isProduction,
-          sameSite: isProduction ? "none" : "lax",
-          domain: isProduction ? "studysync.denzeliskandar.com" : ".localhost",
+          sameSite: COOKIES_SAME_SITE,
+          domain: COOKIES_DOMAIN,
           maxAge: 1800000,
         });
         res.cookie("refreshToken", newTokens.refreshToken, {
           httpOnly: isProduction,
           path: "/",
           secure: isProduction,
-          sameSite: isProduction ? "none" : "lax",
-          domain: isProduction ? "studysync.denzeliskandar.com" : ".localhost",
+          sameSite: COOKIES_SAME_SITE,
+          domain: COOKIES_DOMAIN,
           maxAge: 7776000000,
         });
 
