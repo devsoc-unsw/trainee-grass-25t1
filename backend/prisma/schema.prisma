@@ -14,13 +14,58 @@ datasource db {
 }
 
 model User {
-    id                     String  @id @default(uuid())
+    id                     String               @id @default(uuid())
     name                   String
-    email                  String  @unique
-    username               String  @unique
+    email                  String               @unique
+    username               String               @unique
     password               String
-    remainingLoginAttempts Int     @default(5)
+    levels                 Int                  @default(1)
+    streaks                Int                  @default(0)
+    xp                     Int                  @default(0)
+    remainingLoginAttempts Int                  @default(5)
+    activeAvatarId         String
+    activeAvatar           Avatar               @relation(fields: [activeAvatarId], references: [id], onDelete: Cascade)
+    activeBackgroundId     String
+    activeBackground       Background           @relation(fields: [activeBackgroundId], references: [id], onDelete: Cascade)
     tokens                 Token[]
+    avatarUnlocked         AvatarUnlocked[]
+    backgroundUnlocked     BackgroundUnlocked[]
+}
+
+model Avatar {
+    id                String           @id @default(uuid())
+    name              String           @unique
+    imageUrl          String
+    unlockRequirement Int              @default(0)
+    unlockedByUsers   AvatarUnlocked[]
+    users             User[]
+}
+
+model Background {
+    id                String               @id @default(uuid())
+    name              String               @unique
+    imageUrl          String
+    unlockRequirement Int                  @default(0)
+    unlockedByUsers   BackgroundUnlocked[]
+    users             User[]
+}
+
+model AvatarUnlocked {
+    userId   String
+    user     User   @relation(fields: [userId], references: [id], onDelete: Cascade)
+    avatarId String
+    avatar   Avatar @relation(fields: [avatarId], references: [id], onDelete: Cascade)
+
+    @@id([userId, avatarId])
+}
+
+model BackgroundUnlocked {
+    userId       String
+    user         User       @relation(fields: [userId], references: [id], onDelete: Cascade)
+    backgroundId String
+    background   Background @relation(fields: [backgroundId], references: [id], onDelete: Cascade)
+
+    @@id([userId, backgroundId])
 }
 
 model Token {
