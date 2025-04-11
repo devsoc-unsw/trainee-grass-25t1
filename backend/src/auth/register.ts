@@ -29,8 +29,28 @@ export async function authRegister(
       message: "Username is already being used by another user.",
     };
 
-  // TODO: Create the user
+  const hashedPassword = getHash(password);
+  const user = await prisma.user.create({
+    data: {
+      name,
+      email,
+      username,
+      password: hashedPassword,
+      institution,
+    },
+  });
 
   // TODO: Generate the token
-  // const token = await generateToken(user.id);
+  const token = generateToken(user.id);
+
+  return {
+    token,
+    user: {
+      id: user.id,
+      name: user.name,
+      email: user.email,
+      username: user.username,
+      institution: user.institution,
+    }
+  }
 }
