@@ -2,28 +2,27 @@ import {
   BackgroundName,
   BACKGROUNDS,
   BACKGROUNDS_MAP,
-  Sprite,
   SpriteName,
   SPRITES,
   SPRITES_MAP,
 } from "@/app/game/gameAssets";
 import kaplay, { GameObj, KAPLAYCtx } from "kaplay";
 
-const SPRITE_SCALE = 12;
+const SPRITE_SCALE = 10;
 const BACKGROUND_SCALE = 10;
-const SPRITE_INITIAL_POSITION = { x: 24, y: 810 };
+const SPRITE_INITIAL_POSITION = { x: 24, y: 790 };
 const BACKGROUND_INITIAL_POSITION = { x: -10, y: -10 };
 const SPRITE_WALKING_SPEED = 400; // walking speed by pixels per second
 
 export default function initGame(canvas: HTMLCanvasElement) {
   const k = initKaplay(canvas);
 
-  // TODO: Change sprite dynamically based on database/local storage
   loadBackgrounds(k);
   loadSprites(k);
 
-  const background = addBackground(k, "sea_life");
-  const player = addSprite(k, "default");
+  // TODO: Change sprite dynamically based on database/local storage
+  const background = addBackground(k, "mcdonalds");
+  const player = addSprite(k, "mcdonalds_worker");
 
   // Move sprites with arrow keys
   setupPlayerMovement(k, player);
@@ -40,6 +39,31 @@ function initKaplay(canvas: HTMLCanvasElement) {
     canvas: canvas,
     pixelDensity: devicePixelRatio,
   });
+}
+
+function loadBackgrounds(k: KAPLAYCtx<{}, never>) {
+  BACKGROUNDS.forEach((background) => {
+    k.loadSprite(background.name, background.path, {
+      sliceX: background.sliceX,
+      sliceY: background.sliceY,
+      anims: background.anims,
+    });
+  });
+}
+
+function addBackground(
+  k: KAPLAYCtx<{}, never>,
+  backgroundName: BackgroundName
+) {
+  const targetSprite = BACKGROUNDS_MAP.get(backgroundName)!;
+
+  const background = k.add([
+    k.sprite(targetSprite.name, { anim: "idle" }),
+    k.pos(BACKGROUND_INITIAL_POSITION.x, BACKGROUND_INITIAL_POSITION.y),
+    k.scale(BACKGROUND_SCALE),
+  ]);
+
+  return background;
 }
 
 function loadSprites(k: KAPLAYCtx<{}, never>) {
@@ -66,31 +90,6 @@ function addSprite(k: KAPLAYCtx<{}, never>, spriteName: SpriteName) {
   ]);
 
   return sprite;
-}
-
-function loadBackgrounds(k: KAPLAYCtx<{}, never>) {
-  BACKGROUNDS.forEach((background) => {
-    k.loadSprite(background.name, background.path, {
-      sliceX: background.sliceX,
-      sliceY: background.sliceY,
-      anims: background.anims,
-    });
-  });
-}
-
-function addBackground(
-  k: KAPLAYCtx<{}, never>,
-  backgroundName: BackgroundName
-) {
-  const targetSprite = BACKGROUNDS_MAP.get(backgroundName)!;
-
-  const background = k.add([
-    k.sprite(targetSprite.name, { anim: "idle" }),
-    k.pos(BACKGROUND_INITIAL_POSITION.x, BACKGROUND_INITIAL_POSITION.y),
-    k.scale(BACKGROUND_SCALE),
-  ]);
-
-  return background;
 }
 
 function setupPlayerMovement(k: KAPLAYCtx<{}, never>, player: GameObj) {
