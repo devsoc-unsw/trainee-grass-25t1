@@ -115,8 +115,8 @@ export const SPRITES = defineSprites([
     sliceY: 3,
     anims: {
       idle: { frames: [0, 1], loop: true, speed: 4 },
-      left: { frames: [6, 7, 6, 8], loop: true, speed: 4 },
-      right: { frames: [3, 4, 3, 5], loop: true, speed: 4 },
+      left: { frames: [3, 4, 3, 5], loop: true, speed: 4 },
+      right: { frames: [6, 7, 6, 8], loop: true, speed: 4 },
     },
   },
   {

@@ -6,8 +6,7 @@ import {
   SPRITES,
   SPRITES_MAP,
 } from "@/app/game/gameAssets";
-import kaplay, { Game, GameObj, KAPLAYCtx } from "kaplay";
-import { Init } from "v8";
+import kaplay, { GameObj, KAPLAYCtx } from "kaplay";
 
 type InitializedGameController = GameController & {
   k: NonNullable<GameController["k"]>;
@@ -50,11 +49,11 @@ export default class GameController {
     this.loadAssets();
 
     // TODO: Change sprite dynamically based on database/local storage
-    this.background = this.changeBackground("mcdonalds");
-    this.player = this.changePlayer("mcdonalds_worker");
+    this.changeBackground(background);
+    this.changePlayer(player);
   }
 
-  public changeBackground(backgroundName: BackgroundName): GameObj | null {
+  public changeBackground(backgroundName: BackgroundName) {
     this.checkInitialization();
 
     // Destroy the previous background if it exists
@@ -64,7 +63,7 @@ export default class GameController {
 
     // Add background
     const targetSprite = BACKGROUNDS_MAP.get(backgroundName)!;
-    const background = this.k.add([
+    this.background = this.k.add([
       this.k.sprite(targetSprite.name, { anim: "idle" }),
       this.k.pos(
         this.backgroundInitialPosition.x,
@@ -72,21 +71,19 @@ export default class GameController {
       ),
       this.k.scale(this.backgroundScale),
     ]);
-
-    return background;
   }
 
-  public changePlayer(spriteName: SpriteName): GameObj | null {
+  public changePlayer(spriteName: SpriteName) {
     this.checkInitialization();
 
     // Destroy the previous sprite if it exists
-    if (this.background) {
-      this.background.destroy();
+    if (this.player) {
+      this.player.destroy();
     }
 
     // Add sprite
     const targetPlayer = SPRITES_MAP.get(spriteName)!;
-    const player = this.k.add([
+    this.player = this.k.add([
       this.k.sprite(targetPlayer.name, { anim: "idle" }),
       this.k.pos(this.playerInitialPosition.x, this.playerInitialPosition.y),
       this.k.scale(this.playerScale),
@@ -96,9 +93,7 @@ export default class GameController {
       },
     ]);
 
-    this.setupPlayerMovement(player);
-
-    return player;
+    this.setupPlayerMovement();
   }
 
   protected checkInitialization(): asserts this is InitializedGameController {
@@ -128,38 +123,38 @@ export default class GameController {
     });
   }
 
-  private setupPlayerMovement(player: GameObj) {
+  private setupPlayerMovement() {
     this.checkInitialization();
 
-    player.onUpdate(() => {
-      player.direction.x = 0;
-      player.direction.y = 0;
+    this.player.onUpdate(() => {
+      this.player.direction.x = 0;
+      this.player.direction.y = 0;
 
-      if (this.k.isKeyDown("left")) player.direction.x = -1;
-      if (this.k.isKeyDown("right")) player.direction.x = 1;
+      if (this.k.isKeyDown("left")) this.player.direction.x = -1;
+      if (this.k.isKeyDown("right")) this.player.direction.x = 1;
 
-      const currentAnim = player.getCurAnim().name ?? "";
+      const currentAnim = this.player.getCurAnim().name ?? "";
 
-      if (player.direction.eq(this.k.vec2(-1, 0)) && currentAnim == "left") {
-        player.play("left");
+      if (this.player.direction.eq(this.k.vec2(-1, 0)) && currentAnim !== "left") {
+        this.player.play("left");
       }
 
-      if (player.direction.eq(this.k.vec2(1, 0)) && currentAnim == "right") {
-        player.play("right");
+      if (this.player.direction.eq(this.k.vec2(1, 0)) && currentAnim !== "right") {
+        this.player.play("right");
       }
 
-      if (player.direction.eq(this.k.vec2(0, 0)) && currentAnim == "idle") {
-        player.play("idle");
+      if (this.player.direction.eq(this.k.vec2(0, 0)) && currentAnim !== "idle") {
+        this.player.play("idle");
       }
 
       // Move the player
-      player.move(player.direction.scale(player.speed));
+      this.player.move(this.player.direction.scale(this.player.speed));
 
       // Clamp player position within canvas bounds
-      player.pos.x = this.k.clamp(
-        player.pos.x,
+      this.player.pos.x = this.k.clamp(
+        this.player.pos.x,
         0,
-        this.k.width() - player.width * player.scale.x
+        this.k.width() - this.player.width * this.player.scale.x
       );
     });
   }

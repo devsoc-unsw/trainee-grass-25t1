@@ -5,11 +5,11 @@ import GameController from "./game.controller";
 
 export default function Game() {
   const canvasRef = useRef<HTMLCanvasElement>(null);
-  const [gameController] = useState<GameController>(new GameController());
+  const [gameController] = useState<GameController>(() => new GameController());
 
   useEffect(() => {
     if (canvasRef.current) {
-      gameController.initGame(canvasRef.current, "default", "mcdonalds");
+      gameController.initGame(canvasRef.current, "beginner_sprout", "mountain");
     }
   }, [canvasRef.current]);
 
