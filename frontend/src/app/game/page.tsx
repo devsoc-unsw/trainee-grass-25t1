@@ -1,11 +1,17 @@
 "use client";
 
 import { useEffect, useRef, useState } from "react";
-import GameController from "./game.controller";
+import GameController from "./GameController";
+import AvatarOptions from "./components/huds/AvatarOptions";
+import { SpriteName } from "./gameAssets";
 
 export default function Game() {
-  const canvasRef = useRef<HTMLCanvasElement>(null);
+  // States
   const [gameController] = useState<GameController>(() => new GameController());
+  const [avatar, setAvatar] = useState<SpriteName>("default");
+
+  // Refs
+  const canvasRef = useRef<HTMLCanvasElement>(null);
 
   useEffect(() => {
     if (canvasRef.current) {
@@ -13,11 +19,7 @@ export default function Game() {
       const gameHeight = 1080;
 
       // Initialise the game with the canvas, player sprite, and background
-      gameController.initGame(
-        canvasRef.current,
-        "beginner_sprout",
-        "night_sky"
-      );
+      gameController.initGame(canvasRef.current, avatar, "night_sky");
 
       /**
        * Function to resize the canvas to fit the window height
@@ -57,10 +59,22 @@ export default function Game() {
       // Clean up function
       return () => window.removeEventListener("resize", handleResize);
     }
-  }, [canvasRef, gameController]);
+  }, [canvasRef, gameController, avatar]);
+
+  useEffect(() => {
+    gameController.changePlayer(avatar);
+  }, [gameController, avatar]);
 
   return (
     <div className="overflow-hidden relative flex items-center justify-center">
+      <nav className="absolute top-0 flex justify-between p-4">
+        {/* TODO: Left section of Navbar */}
+        <div>
+          <AvatarOptions avatar={avatar} setAvatar={setAvatar} />
+        </div>
+        {/* TODO: Right section of Navbar */}
+        <div></div>
+      </nav>
       <canvas ref={canvasRef} id="game" />
     </div>
   );
