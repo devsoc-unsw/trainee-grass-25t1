@@ -104,6 +104,7 @@ export type Sprite = {
     left: { frames: number[]; loop: boolean; speed: number };
     right: { frames: number[]; loop: boolean; speed: number };
   };
+  offset: number;
 };
 
 export const SPRITES = defineSprites([
@@ -118,6 +119,7 @@ export const SPRITES = defineSprites([
       left: { frames: [3, 4, 3, 5], loop: true, speed: 4 },
       right: { frames: [6, 7, 6, 8], loop: true, speed: 4 },
     },
+    offset: 72,
   },
   {
     name: "cinnamoroll",
@@ -130,6 +132,7 @@ export const SPRITES = defineSprites([
       left: { frames: [3, 4, 3, 5], loop: true, speed: 4 },
       right: { frames: [6, 7, 6, 8], loop: true, speed: 4 },
     },
+    offset: 8,
   },
   {
     name: "mcdonalds_worker",
@@ -142,6 +145,7 @@ export const SPRITES = defineSprites([
       left: { frames: [3, 4, 3, 5], loop: true, speed: 4 },
       right: { frames: [6, 7, 6, 8], loop: true, speed: 4 },
     },
+    offset: 16,
   },
   {
     name: "pikachu",
@@ -154,6 +158,7 @@ export const SPRITES = defineSprites([
       left: { frames: [3, 4, 3, 5], loop: true, speed: 4 },
       right: { frames: [6, 7, 6, 8], loop: true, speed: 4 },
     },
+    offset: 16,
   },
   {
     name: "skibidi_toilet",
@@ -166,6 +171,7 @@ export const SPRITES = defineSprites([
       left: { frames: [3, 4, 3, 5], loop: true, speed: 4 },
       right: { frames: [6, 7, 6, 8], loop: true, speed: 4 },
     },
+    offset: 16,
   },
   {
     name: "beginner_sprout",
@@ -178,6 +184,7 @@ export const SPRITES = defineSprites([
       left: { frames: [3, 4, 3, 5], loop: true, speed: 4 },
       right: { frames: [6, 7, 6, 8], loop: true, speed: 4 },
     },
+    offset: 40,
   },
 ] as const);
 

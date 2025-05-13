@@ -15,6 +15,7 @@ type InitializedGameController = GameController & {
 };
 
 export default class GameController {
+    // eslint-disable-next-line @typescript-eslint/no-empty-object-type
   protected k: KAPLAYCtx<{}, never> | null = null;
   protected player: GameObj | null = null;
   protected background: GameObj | null = null;
@@ -90,6 +91,7 @@ export default class GameController {
       {
         speed: this.playerWalkingSpeed, // walking speed by pixels per second
         direction: this.k.vec2(0, 0), // walking direction
+        offset: targetPlayer.offset, // offset for the sprite
       },
     ]);
 
@@ -135,15 +137,24 @@ export default class GameController {
 
       const currentAnim = this.player.getCurAnim().name ?? "";
 
-      if (this.player.direction.eq(this.k.vec2(-1, 0)) && currentAnim !== "left") {
+      if (
+        this.player.direction.eq(this.k.vec2(-1, 0)) &&
+        currentAnim !== "left"
+      ) {
         this.player.play("left");
       }
 
-      if (this.player.direction.eq(this.k.vec2(1, 0)) && currentAnim !== "right") {
+      if (
+        this.player.direction.eq(this.k.vec2(1, 0)) &&
+        currentAnim !== "right"
+      ) {
         this.player.play("right");
       }
 
-      if (this.player.direction.eq(this.k.vec2(0, 0)) && currentAnim !== "idle") {
+      if (
+        this.player.direction.eq(this.k.vec2(0, 0)) &&
+        currentAnim !== "idle"
+      ) {
         this.player.play("idle");
       }
 
@@ -153,8 +164,10 @@ export default class GameController {
       // Clamp player position within canvas bounds
       this.player.pos.x = this.k.clamp(
         this.player.pos.x,
-        0,
-        this.k.width() - this.player.width * this.player.scale.x
+        -this.player.offset,
+        this.k.width() -
+          this.player.width * this.player.scale.x +
+          this.player.offset
       );
     });
   }

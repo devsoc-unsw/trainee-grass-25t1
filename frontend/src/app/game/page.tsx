@@ -11,7 +11,7 @@ export default function Game() {
     if (canvasRef.current) {
       gameController.initGame(canvasRef.current, "beginner_sprout", "mountain");
     }
-  }, [canvasRef.current]);
+  }, [canvasRef, gameController]);
 
   return <canvas ref={canvasRef} id="game" />;
 }
