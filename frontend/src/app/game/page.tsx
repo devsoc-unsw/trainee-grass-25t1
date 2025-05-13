@@ -59,7 +59,8 @@ export default function Game() {
       // Clean up function
       return () => window.removeEventListener("resize", handleResize);
     }
-  }, [canvasRef, gameController, avatar]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [canvasRef, gameController]);
 
   useEffect(() => {
     gameController.changePlayer(avatar);

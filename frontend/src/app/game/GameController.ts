@@ -103,7 +103,9 @@ export default class GameController {
     this.checkInitialization();
 
     // Destroy the previous sprite if it exists
+    let previousPosition = this.playerInitialPosition;
     if (this.player) {
+      previousPosition = { x: this.player.pos.x, y: this.player.pos.y };
       this.player.destroy();
     }
 
@@ -112,10 +114,7 @@ export default class GameController {
     const { left } = this.getBoundingPosition();
     this.player = this.k.add([
       this.k.sprite(targetPlayer.name, { anim: "idle" }),
-      this.k.pos(
-        left + this.playerInitialPosition.x,
-        this.playerInitialPosition.y
-      ),
+      this.k.pos(left + previousPosition.x, previousPosition.y),
       this.k.scale(this.playerScale),
       {
         speed: this.playerWalkingSpeed, // walking speed by pixels per second
