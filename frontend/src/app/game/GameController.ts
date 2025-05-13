@@ -25,7 +25,7 @@ export default class GameController {
   // Configuration constants
   private readonly playerScale = 10;
   private readonly backgroundScale = 10;
-  private readonly playerInitialPosition = { x: 24, y: 748 };
+  private readonly playerInitialPosition = { x: 0, y: 748 };
   private readonly backgroundInitialPosition = { x: -10, y: -10 };
   private readonly playerWalkingSpeed = 400; // walking speed by pixels per second
   private readonly platformHeight = 96;
@@ -61,7 +61,7 @@ export default class GameController {
     // Load all game assets (sprites and backgrounds)
     this.loadAssets();
 
-    // TODO: Change sprite dynamically based on database/local storage
+    // Change background and sprite
     this.changeBackground(background);
     this.changePlayer(player);
 
