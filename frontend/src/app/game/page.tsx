@@ -1,14 +1,15 @@
 "use client";
 
-import { useEffect, useRef } from "react";
-import initGame from "./initGame";
+import { useEffect, useRef, useState } from "react";
+import GameController from "./game.controller";
 
 export default function Game() {
   const canvasRef = useRef<HTMLCanvasElement>(null);
+  const [gameController] = useState<GameController>(new GameController());
 
   useEffect(() => {
     if (canvasRef.current) {
-      initGame(canvasRef.current);
+      gameController.initGame(canvasRef.current, "default", "mcdonalds");
     }
   }, [canvasRef.current]);
 
