@@ -103,15 +103,15 @@ export default class GameController {
     this.checkInitialization();
 
     // Destroy the previous sprite if it exists
+    const { left } = this.getBoundingPosition();
     let previousPosition = this.playerInitialPosition;
     if (this.player) {
-      previousPosition = { x: this.player.pos.x, y: this.player.pos.y };
+      previousPosition = { x: this.player.pos.x - left, y: this.player.pos.y };
       this.player.destroy();
     }
 
     // Add the new player to the game
     const targetPlayer = SPRITES_MAP.get(spriteName)!;
-    const { left } = this.getBoundingPosition();
     this.player = this.k.add([
       this.k.sprite(targetPlayer.name, { anim: "idle" }),
       this.k.pos(left + previousPosition.x, previousPosition.y),
