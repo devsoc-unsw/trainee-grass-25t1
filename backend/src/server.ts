@@ -1,5 +1,5 @@
 // Server imports
-import express, { Request, Response, NextFunction } from "express";
+import express, { Request, Response, NextFunction, response } from "express";
 import morgan from "morgan";
 import errorHandler from "middleware-http-errors";
 import cors from "cors";
@@ -16,6 +16,7 @@ import { deleteToken, generateToken } from "./helper/tokenHelper";
 import { authRegister } from "./auth/register";
 import { authLogin } from "./auth/login";
 import { authLogout } from "./auth/logout";
+import { getStreakCounter } from "./userInfos/userStreak";
 
 // Database client
 const prisma = new PrismaClient();
@@ -150,6 +151,19 @@ app.post(
     }
   }
 );
+
+app.get("/streak", async(req, res) => {
+
+  try { 
+    // get the streak
+    const streak = await getStreakCounter();
+    res.json(streak);
+  } catch (error: any) {
+    // Handgle Error
+    res.json("Error");
+  }
+
+})
 
 ///////////////////////// SERVER /////////////////////////
 
