@@ -14,7 +14,7 @@ export async function authRegister(
   leetcodeSessionCookie: string
 ) {
   // Error Handling
-  if (leetcodeHandle && leetcodeHandle.trim() != '') {
+  if (!leetcodeHandle && leetcodeHandle.trim() != '') {
     throw {
       status: 400,
       message: "LeetCode handle not found. Please provide a valid username.",
