@@ -1,22 +1,14 @@
-export async function getStreakCounter() {
-    
-    const response = await fetch("https://leetcode.com/graphql", {
-      method: 'POST',
-      body: JSON.stringify({
-        query: `
-        query getStreakCounter {
-          streakCounter {
-            streakCount
-            daysSkipped
-            currentDayCompleted
-          }
-        }
-      `
-      })
-    })
+import { PrismaClient } from "@prisma/client";
 
-    const data: any = await response.json();
-    const streak = data.streakCounter;
+export async function getStreakCounter(userId: string) {
+  
+  const prisma = new PrismaClient();
 
-    return streak.streakCount;
+  const user: any =  await prisma.user.findUnique({
+    where: {id: userId},
+  });
+
+  const streak = user.streaks;
+
+  return streak;
 }
