@@ -91,7 +91,7 @@ export async function checkBlockedAccount(email: string): Promise<boolean> {
   else return false;
 }
 
-export async function validateLeetcodeHandle(leetcodeHandle: string, leetcodeSessionCookie: string): Promise<any | null> {
+export async function validateLeetcodeHandle(leetcodeSessionCookie: string): Promise<any | null> {
   try {
     const query = `
       query getUserProfile($username: String!) {
@@ -108,10 +108,7 @@ export async function validateLeetcodeHandle(leetcodeHandle: string, leetcodeSes
 
     const response = await axios.post(
       LEETCODE_API_ENDPOINT,
-      {
-        query,
-        variables: { username: leetcodeHandle },
-      },
+      { query },
       {
         headers: {
           'Content-Type': 'application/json',
@@ -121,11 +118,12 @@ export async function validateLeetcodeHandle(leetcodeHandle: string, leetcodeSes
       }
     );
     // Check user exists in leetCode
-    if (!response.data.data.matchedUser) {
+    const user = response.data.data?.user;
+    if (!user) {
       return null;
     }
     
-    return response.data.data.matchedUser;
+    return user;
   } catch(error) {
     console.error("Error validating user in leetcode", error);
     return null;
