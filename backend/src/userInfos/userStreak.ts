@@ -8,7 +8,10 @@ export async function getStreakCounter(userId: string) {
     where: {id: userId},
   });
 
-  const streak = user.streaks;
+  if (user) {
+    return {error: "failed to Find User"};
+  }
 
+  const streak = user.streaks;
   return streak;
 }
