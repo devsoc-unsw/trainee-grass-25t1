@@ -1,9 +1,4 @@
-type ExtractKeyValues<
-  T extends ReadonlyArray<unknown>,
-  Key extends string,
-> = Extract<T[number], { [key in Key]: unknown }>[Key];
-
-export type Background = {
+export type BaseSprite = {
   name: string;
   displayName: string;
   path: string;
@@ -13,6 +8,13 @@ export type Background = {
     idle: { frames: number[]; loop: boolean; speed: number };
   };
 };
+
+type ExtractKeyValues<
+  T extends ReadonlyArray<unknown>,
+  Key extends string,
+> = Extract<T[number], { [key in Key]: unknown }>[Key];
+
+export type Background = BaseSprite;
 
 export const BACKGROUNDS = defineBackgrounds([
   {
@@ -93,17 +95,12 @@ export const BACKGROUNDS_MAP = new Map<string, Background>(
   BACKGROUNDS.map((background) => [background.name, background])
 );
 
-export type Sprite = {
-  name: string;
-  displayName: string;
-  path: string;
-  sliceX: number;
-  sliceY: number;
+export type Sprite = BaseSprite & {
   anims: {
-    idle: { frames: number[]; loop: boolean; speed: number };
     left: { frames: number[]; loop: boolean; speed: number };
     right: { frames: number[]; loop: boolean; speed: number };
   };
+  offset: number;
 };
 
 export const SPRITES = defineSprites([
@@ -115,9 +112,10 @@ export const SPRITES = defineSprites([
     sliceY: 3,
     anims: {
       idle: { frames: [0, 1], loop: true, speed: 4 },
-      left: { frames: [6, 7, 6, 8], loop: true, speed: 4 },
-      right: { frames: [3, 4, 3, 5], loop: true, speed: 4 },
+      left: { frames: [3, 4, 3, 5], loop: true, speed: 4 },
+      right: { frames: [6, 7, 6, 8], loop: true, speed: 4 },
     },
+    offset: 72,
   },
   {
     name: "cinnamoroll",
@@ -130,6 +128,7 @@ export const SPRITES = defineSprites([
       left: { frames: [3, 4, 3, 5], loop: true, speed: 4 },
       right: { frames: [6, 7, 6, 8], loop: true, speed: 4 },
     },
+    offset: 8,
   },
   {
     name: "mcdonalds_worker",
@@ -142,6 +141,7 @@ export const SPRITES = defineSprites([
       left: { frames: [3, 4, 3, 5], loop: true, speed: 4 },
       right: { frames: [6, 7, 6, 8], loop: true, speed: 4 },
     },
+    offset: 16,
   },
   {
     name: "pikachu",
@@ -154,6 +154,7 @@ export const SPRITES = defineSprites([
       left: { frames: [3, 4, 3, 5], loop: true, speed: 4 },
       right: { frames: [6, 7, 6, 8], loop: true, speed: 4 },
     },
+    offset: 16,
   },
   {
     name: "skibidi_toilet",
@@ -166,6 +167,7 @@ export const SPRITES = defineSprites([
       left: { frames: [3, 4, 3, 5], loop: true, speed: 4 },
       right: { frames: [6, 7, 6, 8], loop: true, speed: 4 },
     },
+    offset: 16,
   },
   {
     name: "beginner_sprout",
@@ -178,6 +180,7 @@ export const SPRITES = defineSprites([
       left: { frames: [3, 4, 3, 5], loop: true, speed: 4 },
       right: { frames: [6, 7, 6, 8], loop: true, speed: 4 },
     },
+    offset: 40,
   },
 ] as const);
 
