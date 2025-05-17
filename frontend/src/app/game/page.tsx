@@ -1,11 +1,19 @@
 "use client";
 
 import { useEffect, useRef, useState } from "react";
-import GameController from "./game.controller";
+import GameController from "./GameController";
+import AvatarOptions from "./components/huds/AvatarOptions";
+import { BackgroundName, SpriteName } from "./gameAssets";
+import BackgroundOptions from "./components/huds/BackgroundOptions";
 
 export default function Game() {
-  const canvasRef = useRef<HTMLCanvasElement>(null);
+  // States
   const [gameController] = useState<GameController>(() => new GameController());
+  const [avatar, setAvatar] = useState<SpriteName>("default");
+  const [background, setBackground] = useState<BackgroundName>("mountain");
+
+  // Refs
+  const canvasRef = useRef<HTMLCanvasElement>(null);
 
   useEffect(() => {
     if (canvasRef.current) {
@@ -13,11 +21,7 @@ export default function Game() {
       const gameHeight = 1080;
 
       // Initialise the game with the canvas, player sprite, and background
-      gameController.initGame(
-        canvasRef.current,
-        "beginner_sprout",
-        "night_sky"
-      );
+      gameController.initGame(canvasRef.current, avatar, background);
 
       /**
        * Function to resize the canvas to fit the window height
@@ -57,10 +61,31 @@ export default function Game() {
       // Clean up function
       return () => window.removeEventListener("resize", handleResize);
     }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [canvasRef, gameController]);
+
+  useEffect(() => {
+    gameController.changeBackground(background);
+  }, [gameController, background]);
+
+  useEffect(() => {
+    gameController.changePlayer(avatar);
+  }, [gameController, avatar]);
 
   return (
     <div className="overflow-hidden relative flex items-center justify-center">
+      <nav className="absolute top-0 flex justify-between p-4">
+        {/* TODO: Left section of Navbar */}
+        <div className="flex gap-2 items-center">
+          <AvatarOptions avatar={avatar} setAvatar={setAvatar} />
+          <BackgroundOptions
+            background={background}
+            setBackground={setBackground}
+          />
+        </div>
+        {/* TODO: Right section of Navbar */}
+        <div className="flex gap-2 items-center"></div>
+      </nav>
       <canvas ref={canvasRef} id="game" />
     </div>
   );

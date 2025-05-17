@@ -25,7 +25,7 @@ export default class GameController {
   // Configuration constants
   private readonly playerScale = 10;
   private readonly backgroundScale = 10;
-  private readonly playerInitialPosition = { x: 24, y: 748 };
+  private readonly playerInitialPosition = { x: 0, y: 748 };
   private readonly backgroundInitialPosition = { x: -10, y: -10 };
   private readonly playerWalkingSpeed = 400; // walking speed by pixels per second
   private readonly platformHeight = 96;
@@ -61,7 +61,7 @@ export default class GameController {
     // Load all game assets (sprites and backgrounds)
     this.loadAssets();
 
-    // TODO: Change sprite dynamically based on database/local storage
+    // Change background and sprite
     this.changeBackground(background);
     this.changePlayer(player);
 
@@ -91,6 +91,7 @@ export default class GameController {
         this.backgroundInitialPosition.y
       ),
       this.k.scale(this.backgroundScale),
+      this.k.z(0), // Make sure it's rendered behind everything
     ]);
   }
 
@@ -103,20 +104,20 @@ export default class GameController {
     this.checkInitialization();
 
     // Destroy the previous sprite if it exists
+    const { left } = this.getBoundingPosition();
+    let previousPosition = this.playerInitialPosition;
     if (this.player) {
+      previousPosition = { x: this.player.pos.x - left, y: this.player.pos.y };
       this.player.destroy();
     }
 
     // Add the new player to the game
     const targetPlayer = SPRITES_MAP.get(spriteName)!;
-    const { left } = this.getBoundingPosition();
     this.player = this.k.add([
       this.k.sprite(targetPlayer.name, { anim: "idle" }),
-      this.k.pos(
-        left + this.playerInitialPosition.x,
-        this.playerInitialPosition.y
-      ),
+      this.k.pos(left + previousPosition.x, previousPosition.y),
       this.k.scale(this.playerScale),
+      this.k.z(10), // Ensure it's rendered above background
       {
         speed: this.playerWalkingSpeed, // walking speed by pixels per second
         direction: this.k.vec2(0, 0), // walking direction
@@ -152,6 +153,7 @@ export default class GameController {
       this.k.rect(this.k.width(), this.platformHeight),
       this.k.color(r, g, b),
       this.k.pos(0, this.k.height() - this.platformHeight),
+      this.k.z(10), // Ensure it's rendered above background
     ]);
 
     // Add a black outline/border at the top of the platform
@@ -159,6 +161,7 @@ export default class GameController {
       this.k.rect(this.k.width(), 8),
       this.k.color(0, 0, 0),
       this.k.pos(0, 0),
+      this.k.z(10), // Ensure it's rendered above background
     ]);
   }
 
