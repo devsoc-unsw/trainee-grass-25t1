@@ -10,17 +10,9 @@ import { PrismaClient } from "@prisma/client";
 const prisma = new PrismaClient();
 
 export async function authRegister(
-  leetcodeHandle: string,
   leetcodeSessionCookie: string
 ) {
   // Error Handling
-  if (!leetcodeHandle && leetcodeHandle.trim() != '') {
-    throw {
-      status: 400,
-      message: "LeetCode handle not found. Please provide a valid username.",
-    }
-  }
-
   if (!leetcodeSessionCookie || leetcodeSessionCookie.trim() === '') {
     throw{
       status: 400,
@@ -28,7 +20,7 @@ export async function authRegister(
     }
   }
 
-  const userData = await validateLeetcodeHandle(leetcodeHandle, leetcodeSessionCookie);
+  const userData = await validateLeetcodeHandle(leetcodeSessionCookie);
 
   if (!userData) {
     throw {
@@ -56,13 +48,13 @@ export async function authRegister(
       email,
       username,
       password: hashedPassword,
-      leetcodeHandle: leetcodeHandle,
+      leetcodeHandle: username,
       activeAvatarId: 'default',
       activeBackgroundId: 'default',
     },
   });
 
-  await storeLeetcodeStats(user.id, leetcodeHandle, leetcodeSessionCookie);
+  await storeLeetcodeStats(user.id, userData, leetcodeSessionCookie);
 
   const token = generateToken(user.id);
 
