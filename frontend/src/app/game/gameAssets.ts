@@ -1,9 +1,4 @@
-type ExtractKeyValues<
-  T extends ReadonlyArray<unknown>,
-  Key extends string,
-> = Extract<T[number], { [key in Key]: unknown }>[Key];
-
-export type Background = {
+export type BaseSprite = {
   name: string;
   displayName: string;
   path: string;
@@ -13,6 +8,13 @@ export type Background = {
     idle: { frames: number[]; loop: boolean; speed: number };
   };
 };
+
+type ExtractKeyValues<
+  T extends ReadonlyArray<unknown>,
+  Key extends string,
+> = Extract<T[number], { [key in Key]: unknown }>[Key];
+
+export type Background = BaseSprite;
 
 export const BACKGROUNDS = defineBackgrounds([
   {
@@ -93,14 +95,8 @@ export const BACKGROUNDS_MAP = new Map<string, Background>(
   BACKGROUNDS.map((background) => [background.name, background])
 );
 
-export type Sprite = {
-  name: string;
-  displayName: string;
-  path: string;
-  sliceX: number;
-  sliceY: number;
+export type Sprite = BaseSprite & {
   anims: {
-    idle: { frames: number[]; loop: boolean; speed: number };
     left: { frames: number[]; loop: boolean; speed: number };
     right: { frames: number[]; loop: boolean; speed: number };
   };

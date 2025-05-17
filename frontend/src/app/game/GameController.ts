@@ -91,6 +91,7 @@ export default class GameController {
         this.backgroundInitialPosition.y
       ),
       this.k.scale(this.backgroundScale),
+      this.k.z(0), // Make sure it's rendered behind everything
     ]);
   }
 
@@ -116,6 +117,7 @@ export default class GameController {
       this.k.sprite(targetPlayer.name, { anim: "idle" }),
       this.k.pos(left + previousPosition.x, previousPosition.y),
       this.k.scale(this.playerScale),
+      this.k.z(10), // Ensure it's rendered above background
       {
         speed: this.playerWalkingSpeed, // walking speed by pixels per second
         direction: this.k.vec2(0, 0), // walking direction
@@ -151,6 +153,7 @@ export default class GameController {
       this.k.rect(this.k.width(), this.platformHeight),
       this.k.color(r, g, b),
       this.k.pos(0, this.k.height() - this.platformHeight),
+      this.k.z(10), // Ensure it's rendered above background
     ]);
 
     // Add a black outline/border at the top of the platform
@@ -158,6 +161,7 @@ export default class GameController {
       this.k.rect(this.k.width(), 8),
       this.k.color(0, 0, 0),
       this.k.pos(0, 0),
+      this.k.z(10), // Ensure it's rendered above background
     ]);
   }
 
