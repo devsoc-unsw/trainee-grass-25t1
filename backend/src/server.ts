@@ -50,14 +50,17 @@ app.get("/", async (req: Request, res: Response) => {
 });
 
 // AUTH ROUTES
-app.post("/auth/register", async (req: Request, res: Response) => {
+app.post("/auth/register", async (req: Request, res: Response): Promise<any> => {
   try {
-    const { name, email, password, username, institution } = req.body;
-    const { accessToken, refreshToken, userId, userName, userUsername } =
-      await authRegister(name, email, password, username, institution);
+    const { leetcodeHandle, leetcodePassword } = req.body;
+    if (!leetcodeHandle || !leetcodePassword) {
+      return res.status(400).json({ error: "Username and password are required."});
+    }
+    const { token , user } =
+      await authRegister(leetcodeHandle, leetcodePassword);
 
     // Assign cookies
-    res.cookie("accessToken", accessToken, {
+    res.cookie("accessToken", token, {
       httpOnly: isProduction,
       path: "/",
       secure: isProduction,
@@ -65,57 +68,12 @@ app.post("/auth/register", async (req: Request, res: Response) => {
       domain: COOKIES_DOMAIN,
       maxAge: 1800000,
     });
-    res.cookie("refreshToken", refreshToken, {
-      httpOnly: isProduction,
-      path: "/",
-      secure: isProduction,
-      sameSite: COOKIES_SAME_SITE,
-      domain: COOKIES_DOMAIN,
-      maxAge: 7776000000,
-    });
 
     res.header("Access-Control-Allow-Credentials", "true");
 
     res
       .status(200)
-      .json({ userId: userId, userName: userName, userUsername: userUsername });
-  } catch (error: any) {
-    console.error(error);
-    res
-      .status(error.status || 500)
-      .json({ error: error.message || "An error occurred." });
-  }
-});
-
-app.post("/auth/login", async (req: Request, res: Response) => {
-  try {
-    const { email, password } = req.body;
-    const { accessToken, refreshToken, userId, userName, userUsername } =
-      await authLogin(email, password);
-
-    // Assign cookies
-    res.cookie("accessToken", accessToken, {
-      httpOnly: isProduction,
-      path: "/",
-      secure: isProduction,
-      sameSite: COOKIES_SAME_SITE,
-      domain: COOKIES_DOMAIN,
-      maxAge: 1800000,
-    });
-    res.cookie("refreshToken", refreshToken, {
-      httpOnly: isProduction,
-      path: "/",
-      secure: isProduction,
-      sameSite: COOKIES_SAME_SITE,
-      domain: COOKIES_DOMAIN,
-      maxAge: 7776000000,
-    });
-
-    res.header("Access-Control-Allow-Credentials", "true");
-
-    res
-      .status(200)
-      .json({ userId: userId, userName: userName, userUsername: userUsername });
+      .json({ userId: user.id, userName: user.name, userUsername: user.username });
   } catch (error: any) {
     console.error(error);
     res
