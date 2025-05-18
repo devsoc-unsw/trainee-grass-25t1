@@ -1,7 +1,8 @@
 import { 
   checkUsernameExists,
   validateLeetcodeHandle,
-  storeLeetcodeStats
+  storeLeetcodeStats,
+  loginLeetCode
 } from "../helper/authHelper";
 import { generateToken } from "../helper/tokenHelper";
 import { getHash } from "../helper/util";
@@ -10,17 +11,12 @@ import { PrismaClient } from "@prisma/client";
 const prisma = new PrismaClient();
 
 export async function authRegister(
-  leetcodeSessionCookie: string
+  leetcodeHandle: string,
+  leetcodePassword: string,
 ) {
   // Error Handling
-  if (!leetcodeSessionCookie || leetcodeSessionCookie.trim() === '') {
-    throw{
-      status: 400,
-      message: "LeetCode session cookie is required.",
-    }
-  }
-
-  const userData = await validateLeetcodeHandle(leetcodeSessionCookie);
+  const leetcodeSession = (await loginLeetCode(leetcodeHandle, leetcodePassword)).leetcodeSession;
+  const userData = await validateLeetcodeHandle(leetcodeSession);
 
   if (!userData) {
     throw {
@@ -54,7 +50,7 @@ export async function authRegister(
     },
   });
 
-  await storeLeetcodeStats(user.id, userData, leetcodeSessionCookie);
+  await storeLeetcodeStats(user.id, userData, leetcodeSession);
 
   const token = generateToken(user.id);
 

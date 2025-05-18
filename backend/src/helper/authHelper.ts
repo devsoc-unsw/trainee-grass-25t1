@@ -2,6 +2,7 @@ import { getHash } from "./util";
 import axios from "axios";
 
 import { PrismaClient } from "@prisma/client";
+import puppeteer from "puppeteer";
 const prisma = new PrismaClient();
 
 // Other constants
@@ -91,6 +92,44 @@ export async function checkBlockedAccount(email: string): Promise<boolean> {
   else return false;
 }
 
+export async function loginLeetCode(username: string, password: string) {
+  const browser = await puppeteer.launch({
+    headless: false,
+    args: ['--no-sandbox', '--disable-setuid-sandbox'],
+  });
+
+  const page = await browser.newPage();
+  await page.goto('https://leetcode.com/accounts/login/', {
+    waitUntil: 'networkidle2',
+  });
+
+  await page.type('#id_login', username, { delay: 30 });
+  await page.type('#id_password', password, { delay: 30 });
+
+  await Promise.all([
+    page.click('button[type=submit]'),
+    page.waitForNavigation({ waitUntil: 'networkidle2' }),
+  ]);
+
+  const cookies = await page.cookies();
+  await browser.close();
+
+  const leetcodeSession= cookies.find(c => c.name === 'LEETCODE_SESSION');
+  const csrfToken = cookies.find(c => c.name === 'csrfToken');
+
+  if (!leetcodeSession || !csrfToken) {
+    throw {
+      status: 401,
+      message: "Failed to log in to LeetCode. Check credentials.",
+    };
+  }
+
+  return {
+    leetcodeSession: leetcodeSession.value,
+    csrfToken: csrfToken.value,
+  }
+}
+
 export async function validateLeetcodeHandle(leetcodeSessionCookie: string): Promise<any | null> {
   try {
     const query = `
@@ -106,9 +145,21 @@ export async function validateLeetcodeHandle(leetcodeSessionCookie: string): Pro
       }
     `;
 
+    const meRes = await axios.get("https://leetcode.com/api/problems/algorithms/", {
+      headers: {
+        Cookie: `LEETCODE_SESSION=${leetcodeSessionCookie}`,
+      },
+    });
+
+    const username = meRes.data.user_name;
+    if (!username) return null;
+
     const response = await axios.post(
       LEETCODE_API_ENDPOINT,
-      { query },
+      {
+        query,
+        variables: { username }, // pass username as variable
+      },
       {
         headers: {
           'Content-Type': 'application/json',
