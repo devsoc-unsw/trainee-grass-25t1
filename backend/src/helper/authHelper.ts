@@ -92,46 +92,6 @@ export async function checkBlockedAccount(email: string): Promise<boolean> {
   else return false;
 }
 
-export async function loginLeetCode(username: string, password: string) {
-  const browser = await puppeteer.launch({
-    headless: false,
-    args: ['--no-sandbox', '--disable-setuid-sandbox'],
-  });
-
-  const page = await browser.newPage();
-  await page.goto('https://leetcode.com/accounts/login/', {
-    waitUntil: 'networkidle2',
-  });
-  
-  await page.waitForSelector('#id_login');
-  await page.type('#id_login', username);
-  
-  await page.waitForSelector('#id_password');
-  await page.type('#id_password', password);
-  
-  await Promise.all([
-    page.click('button[type=submit]'),
-    page.waitForNavigation({ waitUntil: 'networkidle2' }),
-  ]);
-
-  const cookies = await page.cookies();
-  await browser.close();
-
-  const leetcodeSession= cookies.find(c => c.name === 'LEETCODE_SESSION');
-  const csrfToken = cookies.find(c => c.name === 'csrfToken');
-
-  if (!leetcodeSession || !csrfToken) {
-    throw {
-      status: 401,
-      message: "Failed to log in to LeetCode. Check credentials.",
-    };
-  }
-
-  return {
-    leetcodeSession: leetcodeSession.value,
-    csrfToken: csrfToken.value,
-  }
-}
 const isDev = process.env.NODE_ENV !== "production";
 
 export async function validateLeetcodeSession(leetcodeSessionCookie: string): Promise<any | null> {
