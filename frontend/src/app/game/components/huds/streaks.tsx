@@ -3,7 +3,10 @@ import GameButton from "@/app/game/components/GameButton";
 import Game from "../../page";
 import { 
   Dialog,
-  DialogTrigger
+  DialogContent,
+  DialogTrigger,
+  DialogTitle,
+  DialogClose
 } from "@radix-ui/react-dialog";
 
 export default function SimpleBox() {
@@ -18,6 +21,17 @@ export default function SimpleBox() {
             </div>
           </GameButton>
       </DialogTrigger>
+      <DialogContent>
+        <DialogTitle className="font-bold text-center text-xl">
+          Change Avatar
+        </DialogTitle>
+        <div className="flex justify-center gap-4">
+        </div>
+        <DialogClose
+          className="bg-foreground text-background w-full p-2 rounded-md cursor-pointer duration-150 disabled:opacity-15 hover:bg-foreground/85 disabled:cursor-not-allowed">
+          Save Avatar
+        </DialogClose>
+      </DialogContent>
     </Dialog>
   );
 }
