@@ -90,7 +90,7 @@ export default function Game() {
         <div className="flex gap-2 items-center"></div>
       </nav>
       <canvas ref={canvasRef} id="game" />
-      <nav className="absolute left-10 top-0 flex justify-between p-4">
+      <nav className="absolute left-10 top-0 justify-between p-4">
           <SimpleBox />
       </nav>
     </div>
