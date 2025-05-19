@@ -19,7 +19,7 @@ export async function authRegister(
   if (!userData) {
     throw {
       status: 400,
-      message: "Invalid LeetCode session or handle. Please check and try again.",
+      message: "Invalid LeetCode session. Please check and try again.",
     }
   }
 
@@ -34,7 +34,8 @@ export async function authRegister(
   });
   if (existingUser) {
     const token = generateToken(existingUser.id);
-
+    const newXP = await updateUserXP(existingUser.id);
+    updateUserLevel(existingUser.id, newXP, prisma);
     return {
       token,
       user: {
@@ -104,6 +105,7 @@ export async function authRegister(
       activeAvatar: "default-avatar-id",
       activeBackground: "default-background-id",
       leetcodeHandle: user.leetcodeHandle,
+      password: user.password,
     }
   }
 }
