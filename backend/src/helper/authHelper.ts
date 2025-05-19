@@ -92,6 +92,7 @@ export async function checkBlockedAccount(email: string): Promise<boolean> {
   else return false;
 }
 
+///////////////////////// LeetCode handling /////////////////////////
 export async function validateLeetcodeSession(leetcodeSessionCookie: string): Promise<any | null> {
   //TODO: Remove after testing stages
   if (leetcodeSessionCookie === 'MOCK_COOKIE') {
@@ -213,6 +214,7 @@ export async function storeLeetcodeStats(
   }
 }
 
+///////////////////////// XP and level handling /////////////////////////
 export function calculateXP(easySolved: number, mediumSolved: number, hardSolved: number): number {
   const easyXP = 5;
   const mediumXP = 10;
