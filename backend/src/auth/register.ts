@@ -1,5 +1,4 @@
 import { 
-  checkUsernameExists,
   validateLeetcodeSession,
   storeLeetcodeStats,
 } from "../helper/authHelper";
