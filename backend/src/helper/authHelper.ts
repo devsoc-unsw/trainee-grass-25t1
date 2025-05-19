@@ -2,11 +2,25 @@ import { getHash } from "./util";
 import axios from "axios";
 
 import { PrismaClient } from "@prisma/client";
-import puppeteer from "puppeteer";
 const prisma = new PrismaClient();
 
 // Other constants
 const LEETCODE_API_ENDPOINT = 'https://leetcode.com/graphql';
+
+// Get user details from userId
+export async function getUserDetails(userId: string) {
+  const user = await prisma.user
+    .findFirst({
+      where: {
+        id: userId,
+      },
+    })
+    .catch((e) => {
+      console.error(e.message);
+    });
+
+  return user;
+  }
 
 export async function checkEmailExists(email: string): Promise<boolean> {
   const res = await prisma.user
