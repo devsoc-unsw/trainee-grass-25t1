@@ -1,6 +1,8 @@
 import { 
   validateLeetcodeSession,
   storeLeetcodeStats,
+  updateUserXP,
+  updateUserLevel,
 } from "../helper/authHelper";
 import { generateToken } from "../helper/tokenHelper";
 import { getHash } from "../helper/util";
@@ -84,6 +86,11 @@ export async function authRegister(
   });
 
   await storeLeetcodeStats(user.id, userData, leetcodeSessionCookie);
+
+  // XP and levels handling
+  const newXP = await updateUserXP(user.id);
+  updateUserLevel(user.id, newXP, prisma);
+
 
   const token = generateToken(user.id);
 

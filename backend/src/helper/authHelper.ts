@@ -92,11 +92,9 @@ export async function checkBlockedAccount(email: string): Promise<boolean> {
   else return false;
 }
 
-const isDev = process.env.NODE_ENV !== "production";
-
 export async function validateLeetcodeSession(leetcodeSessionCookie: string): Promise<any | null> {
   //TODO: Remove after testing stages
-  if (isDev) {
+  if (leetcodeSessionCookie === 'MOCK_COOKIE') {
     // Simulate a successful response
     return {
       username: "mockUser",
@@ -213,4 +211,66 @@ export async function storeLeetcodeStats(
   } catch (error) {
     console.error("Error storing LeetCode stats from validated user", error);
   }
+}
+
+export function calculateXP(easySolved: number, mediumSolved: number, hardSolved: number): number {
+  const easyXP = 5;
+  const mediumXP = 10;
+  const hardXP = 20;
+
+  const xp = (easySolved || 0) * easyXP + (mediumSolved || 0) * mediumXP + (hardSolved || 0)* hardXP;
+
+  return xp;
+}
+
+export async function updateUserXP(userId: string) {
+  const stats = await prisma.leetCodeStats.findUnique({
+    where: { userId },
+  });
+
+  if (!stats) return 0;
+
+  const xp = calculateXP(stats.easySolved, stats.mediumSolved, stats.hardSolved);
+  
+  await prisma.user.update({
+    where: { id: userId },
+    data: { xp },
+  });
+
+  return xp;
+}
+
+// level handling
+const levelThresholds = [
+  { level: 1, xp: 0 },
+  { level: 2, xp: 10 },
+  { level: 3, xp: 30 },
+  { level: 4, xp: 55 },
+  { level: 5, xp: 80 },
+];
+
+export function getLevelFromXP(xp: number): number {
+  let level = 1;
+  for (const threshold of levelThresholds) {
+    if (xp >= threshold.xp) {
+      level = threshold.level;
+    } else {
+      break;
+    }
+  }
+  return level;
+}
+
+export async function updateUserLevel(userId: string, xp: number, prisma: PrismaClient) {
+  const level = getLevelFromXP(xp);
+
+  await prisma.user.update({
+    where: { id: userId },
+    data: {
+      xp,
+      levels: level,
+    },
+  });
+
+  return level;
 }
