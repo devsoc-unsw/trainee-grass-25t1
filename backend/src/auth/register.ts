@@ -2,7 +2,6 @@ import {
   checkUsernameExists,
   validateLeetcodeHandle,
   storeLeetcodeStats,
-  loginLeetCode
 } from "../helper/authHelper";
 import { generateToken } from "../helper/tokenHelper";
 import { getHash } from "../helper/util";
@@ -11,12 +10,10 @@ import { PrismaClient } from "@prisma/client";
 const prisma = new PrismaClient();
 
 export async function authRegister(
-  leetcodeHandle: string,
-  leetcodePassword: string,
+  leetcodeSessionCookie: string
 ) {
   // Error Handling
-  const leetcodeSession = (await loginLeetCode(leetcodeHandle, leetcodePassword)).leetcodeSession;
-  const userData = await validateLeetcodeHandle(leetcodeSession);
+  const userData = await validateLeetcodeHandle(leetcodeSessionCookie);
 
   if (!userData) {
     throw {
@@ -38,6 +35,30 @@ export async function authRegister(
     }
   }
 
+  const defaultAvatar = await prisma.avatar.upsert({
+    where: { name: "default" },
+    update: {},
+    create: {
+      name: "default",
+      imageUrl: "/sprites/default.png",
+      unlockRequirement: 0,
+    },
+  });
+  
+  const defaultBackground = await prisma.background.upsert({
+    where: { name: "mountain" },
+    update: {},
+    create: {
+      name: "mountain",
+      imageUrl: "/backgrounds/mountain.png",
+      unlockRequirement: 0,
+    },
+  });
+  
+  if (!defaultAvatar || !defaultBackground) {
+    throw new Error("Default avatar or background not found");
+  }
+
   const user = await prisma.user.create({
     data: {
       name,
@@ -45,12 +66,12 @@ export async function authRegister(
       username,
       password: hashedPassword,
       leetcodeHandle: username,
-      activeAvatarId: 'default',
-      activeBackgroundId: 'default',
+      activeAvatarId: defaultAvatar.id,
+      activeBackgroundId: defaultBackground.id,
     },
   });
 
-  await storeLeetcodeStats(user.id, userData, leetcodeSession);
+  await storeLeetcodeStats(user.id, userData, leetcodeSessionCookie);
 
   const token = generateToken(user.id);
 

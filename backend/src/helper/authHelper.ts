@@ -102,10 +102,13 @@ export async function loginLeetCode(username: string, password: string) {
   await page.goto('https://leetcode.com/accounts/login/', {
     waitUntil: 'networkidle2',
   });
-
-  await page.type('#id_login', username, { delay: 30 });
-  await page.type('#id_password', password, { delay: 30 });
-
+  
+  await page.waitForSelector('#id_login');
+  await page.type('#id_login', username);
+  
+  await page.waitForSelector('#id_password');
+  await page.type('#id_password', password);
+  
   await Promise.all([
     page.click('button[type=submit]'),
     page.waitForNavigation({ waitUntil: 'networkidle2' }),
@@ -129,8 +132,20 @@ export async function loginLeetCode(username: string, password: string) {
     csrfToken: csrfToken.value,
   }
 }
+const isDev = process.env.NODE_ENV !== "production";
 
 export async function validateLeetcodeHandle(leetcodeSessionCookie: string): Promise<any | null> {
+  if (isDev) {
+    // Simulate a successful response
+    return {
+      username: "mockUser",
+      profile: {
+        realName: "Mock Real Name",
+        userAvatar: "https://example.com/mock-avatar.png",
+        school: "Mock University"
+      }
+    };
+  }
   try {
     const query = `
       query getUserProfile($username: String!) {
@@ -169,7 +184,7 @@ export async function validateLeetcodeHandle(leetcodeSessionCookie: string): Pro
       }
     );
     // Check user exists in leetCode
-    const user = response.data.data?.user;
+    const user = response.data.data?.matchedUser;
     if (!user) {
       return null;
     }
