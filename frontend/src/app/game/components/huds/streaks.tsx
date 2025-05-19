@@ -29,11 +29,10 @@ export default function SimpleBox() {
           View Streaks
         </DialogTitle>
         <div className="flex justify-center gap-4">
-          <div className="flex-1 flex justify-center items-center">
-                      
-          </div>
           <div className="grid grid-cols-2 h-96 overflow-y-auto">
-            
+            <span>Streak Count</span>
+            <span>days Skipped</span>
+            <span>currentDayCompleted</span>
           </div>
         </div>
         <DialogClose
