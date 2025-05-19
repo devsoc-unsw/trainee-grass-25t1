@@ -21,15 +21,24 @@ export default function SimpleBox() {
             </div>
           </GameButton>
       </DialogTrigger>
-      <DialogContent>
+      <DialogContent 
+        className="bg-white rounded-lg p-6 shadow-lg max-w-md w-full
+          fixed top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2"
+      >
         <DialogTitle className="font-bold text-center text-xl">
-          Change Avatar
+          View Streaks
         </DialogTitle>
         <div className="flex justify-center gap-4">
+          <div className="flex-1 flex justify-center items-center">
+                      
+          </div>
+          <div className="grid grid-cols-2 h-96 overflow-y-auto">
+            
+          </div>
         </div>
         <DialogClose
           className="bg-foreground text-background w-full p-2 rounded-md cursor-pointer duration-150 disabled:opacity-15 hover:bg-foreground/85 disabled:cursor-not-allowed">
-          Save Avatar
+          Update Streaks
         </DialogClose>
       </DialogContent>
     </Dialog>
