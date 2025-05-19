@@ -28,11 +28,24 @@ export async function authRegister(
   const password = crypto.randomUUID();
   const hashedPassword = getHash(password);
 
-  if ( await checkUsernameExists(username)) {
-    throw {
-      status: 400,
-      message: "This LeetCode account is already registered.",
-    }
+  const existingUser = await prisma.user.findFirst({
+    where: { username },
+  });
+  if (existingUser) {
+    const token = generateToken(existingUser.id);
+
+    return {
+      token,
+      user: {
+        id: existingUser.id,
+        name: existingUser.name,
+        email: existingUser.email,
+        username: existingUser.username,
+        activeAvatar: existingUser.activeAvatarId,
+        activeBackground: existingUser.activeBackgroundId,
+        leetcodeHandle: existingUser.leetcodeHandle,
+      },
+    };
   }
 
   const defaultAvatar = await prisma.avatar.upsert({
