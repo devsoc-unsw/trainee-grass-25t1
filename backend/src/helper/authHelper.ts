@@ -135,6 +135,7 @@ export async function loginLeetCode(username: string, password: string) {
 const isDev = process.env.NODE_ENV !== "production";
 
 export async function validateLeetcodeHandle(leetcodeSessionCookie: string): Promise<any | null> {
+  //TODO: Remove after testing stages
   if (isDev) {
     // Simulate a successful response
     return {
