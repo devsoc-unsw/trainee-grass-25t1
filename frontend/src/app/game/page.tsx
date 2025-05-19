@@ -5,7 +5,7 @@ import GameController from "./GameController";
 import AvatarOptions from "./components/huds/AvatarOptions";
 import { BackgroundName, SpriteName } from "./gameAssets";
 import BackgroundOptions from "./components/huds/BackgroundOptions";
-import SimpleBox from "./components/streaks";
+import SimpleBox from "./components/huds/streaks";
 
 export default function Game() {
   // States
@@ -90,7 +90,9 @@ export default function Game() {
         <div className="flex gap-2 items-center"></div>
       </nav>
       <canvas ref={canvasRef} id="game" />
-      <SimpleBox />
+      <nav className="absolute left-10 top-0 flex justify-between p-4">
+          <SimpleBox />
+      </nav>
     </div>
   );
 }
