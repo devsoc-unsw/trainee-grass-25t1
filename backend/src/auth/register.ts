@@ -1,6 +1,6 @@
 import { 
   checkUsernameExists,
-  validateLeetcodeHandle,
+  validateLeetcodeSession,
   storeLeetcodeStats,
 } from "../helper/authHelper";
 import { generateToken } from "../helper/tokenHelper";
@@ -13,7 +13,7 @@ export async function authRegister(
   leetcodeSessionCookie: string
 ) {
   // Error Handling
-  const userData = await validateLeetcodeHandle(leetcodeSessionCookie);
+  const userData = await validateLeetcodeSession(leetcodeSessionCookie);
 
   if (!userData) {
     throw {
