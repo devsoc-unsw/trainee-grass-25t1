@@ -41,7 +41,7 @@ export default function SpritePreviewOption<T extends BaseSprite>({
         />
       </div>
       <p
-        className={`text-sm text-center text-ellipsis peer-checked:text-green-500 ${
+        className={`text-sm text-center w-full truncate peer-checked:text-green-500 ${
           selected && "font-bold"
         }`}
       >
