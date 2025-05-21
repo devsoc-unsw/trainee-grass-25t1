@@ -8,7 +8,7 @@ export async function getStreakCounter(userId: string) {
     where: {id: userId},
   });
 
-  if (user) {
+  if (!user) {
     return {error: "failed to Find User"};
   }
 

@@ -6,7 +6,7 @@ import cors from "cors";
 import "dotenv/config";
 import cookieParser from "cookie-parser";
 import { PrismaClient } from "@prisma/client";
-import { Server } from "http";
+import { request, Server } from "http";
 import jwt, { JwtPayload } from "jsonwebtoken";
 
 // Helper functions
@@ -152,17 +152,17 @@ app.post(
   }
 );
 
-app.get("/streak", async(req, res) => {
+app.get("/streak", async(req: Request, res: Response) => {
 
   try { 
     // get the streak
-    const streak = await getStreakCounter();
+    const userId = res.locals.userId;
+    const streak = await getStreakCounter(userId);
     res.json(streak);
   } catch (error: any) {
     // Handgle Error
     res.json("Error");
   }
-
 })
 
 ///////////////////////// SERVER /////////////////////////
