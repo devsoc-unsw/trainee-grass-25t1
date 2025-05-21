@@ -84,15 +84,15 @@ export default function Game() {
             background={background}
             setBackground={setBackground}
           />
+          <SimpleBox />
         </div>
         {/* TODO: Right section of Navbar */}
 
         <div className="flex gap-2 items-center"></div>
       </nav>
       <canvas ref={canvasRef} id="game" />
-      <nav className="absolute left-10 top-0 justify-between p-4">
-          <SimpleBox />
-      </nav>
+  
+
     </div>
   );
 }

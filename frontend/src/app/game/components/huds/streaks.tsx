@@ -1,6 +1,5 @@
 import BullseyeArrow from "@/components/icons/BullseyeArrow";
 import GameButton from "@/app/game/components/GameButton";
-import Game from "../../page";
 import { 
   Dialog,
   DialogContent,
@@ -9,7 +8,6 @@ import {
   DialogClose
 } from "@radix-ui/react-dialog";
 import React, {useEffect, useState} from "react";
-import { error } from "console";
 
 
 export default function SimpleBox() {
@@ -37,11 +35,12 @@ export default function SimpleBox() {
     <Dialog>
       <DialogTrigger asChild>
           <GameButton>
-            <div className="absolute top-0 left-20 bg-white border-5 w-100 h-16" >
-                <span className="absolute top-3 left-20 text-2xl" style={{ fontFamily: "var(--font-pixelify)", fontWeight: "bold" }}>Streaks </span>
-                <span className="absolute top-3 left-70 text-2xl" style={{ fontFamily: "var(--font-pixelify)", fontWeight: "bold" }}>{streak.streakCount}</span>
-                <span className="absolute top-3 left-75 text-2xl" style={{ fontFamily: "var(--font-pixelify)", fontWeight: "bold" }}>days </span>
-                <BullseyeArrow className="absolute w-10 h-10 top-2 left-5 text-black" />
+            <div className="flex items-center w-60 justify-between" >
+                <div className="flex items-center">
+                  <BullseyeArrow className="w-10 h-10 top-2 left-5 text-black" />
+                  <span>Streaks </span>
+                </div>
+                <span>{streak.streakCount} days </span>
             </div>
           </GameButton>
       </DialogTrigger>
@@ -54,12 +53,12 @@ export default function SimpleBox() {
         </DialogTitle>
         <div className="flex justify-center gap-4">
           <div className="grid grid-cols-2 h-96 overflow-y-auto">
-            <span className="absolute text-2xl left-5 top-25">Streak Count:</span>
-            <span className="absolute text-2xl left-90 top-25">{streak.streakCount}</span>
-            <span className="absolute text-2xl left-5 top-55">days Skipped:</span>
-            <span className="absolute text-2xl left-90 top-55">{streak.daysSkipped}</span>
-            <span className="absolute text-2xl left-5 top-85">currentDayCompleted:</span>
-            <span className="absolute text-2xl left-90 top-85">{streak.currentDayCompleted}</span>
+            <span className=" text-2xl left-5 top-25">Streak Count:</span>
+            <span className=" text-2xl left-90 top-25">{streak.streakCount}</span>
+            <span className=" text-2xl left-5 top-55">days Skipped:</span>
+            <span className=" text-2xl left-90 top-55">{streak.daysSkipped}</span>
+            <span className=" text-2xl left-5 top-85">currentDayCompleted:</span>
+            <span className=" text-2xl left-90 top-85">{streak.currentDayCompleted}</span>
           </div>
         </div>
         <DialogClose
