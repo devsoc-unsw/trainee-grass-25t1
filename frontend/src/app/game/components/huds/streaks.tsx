@@ -63,10 +63,10 @@ export default function SimpleBox() {
           </div>
         </div>
         <DialogClose
-          className="bg-foreground text-background w-full p-2 rounded-md cursor-pointer duration-150 disabled:opacity-15 hover:bg-foreground/85 disabled:cursor-not-allowed">
-          <button>
+          className="bg-foreground text-background w-full p-2 rounded-md cursor-pointer duration-150 disabled:opacity-15 hover:bg-foreground/85 disabled:cursor-not-allowed"
+          onClick={() => fetchStreak()}
+          >
             Update Streaks
-          </button>
         </DialogClose>
       </DialogContent>
     </Dialog>
