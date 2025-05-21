@@ -2,6 +2,7 @@ import { getHash } from "./util";
 import axios from "axios";
 
 import { PrismaClient } from "@prisma/client";
+import { getUserById } from "./userHelper";
 const prisma = new PrismaClient();
 
 // Other constants
@@ -198,15 +199,18 @@ export async function storeLeetcodeStats(
     const statsData = response.data?.data?.matchedUser;
     if (!statsData) return;
 
-    await prisma.leetCodeStats.create({
+    const findCount = (difficulty: string) =>
+      statsData.submitStats.acSubmissionNum.find((item: any) => item.difficulty === difficulty)?.count || 0;
+
+    await prisma.user.update({
+      where: { id: userId },
       data: {
-        userId,
-        totalSolved: statsData.submitStats.acSubmissionNum.find((item: any) => item.difficulty === "All")?.count || 0,
-        easySolved: statsData.submitStats.acSubmissionNum.find((item: any) => item.difficulty === "Easy")?.count || 0,
-        mediumSolved: statsData.submitStats.acSubmissionNum.find((item: any) => item.difficulty === "Medium")?.count || 0,
-        hardSolved: statsData.submitStats.acSubmissionNum.find((item: any) => item.difficulty === "Hard")?.count || 0,
+        totalSolved: findCount("All"),
+        easySolved: findCount("Easy"),
+        mediumSolved: findCount("Medium"),
+        hardSolved: findCount("Hard"),
         ranking: statsData.profile.ranking || 0,
-        lastUpdated: new Date(),
+        leetcodeLastUpdated: new Date(),
       },
     });
   } catch (error) {
@@ -226,13 +230,11 @@ export function calculateXP(easySolved: number, mediumSolved: number, hardSolved
 }
 
 export async function updateUserXP(userId: string) {
-  const stats = await prisma.leetCodeStats.findUnique({
-    where: { userId },
-  });
+  const user = await getUserById(userId);
 
-  if (!stats) return 0;
+  if (!user) return 0;
 
-  const xp = calculateXP(stats.easySolved, stats.mediumSolved, stats.hardSolved);
+  const xp = calculateXP(user.easySolved, user.mediumSolved, user.hardSolved);
   
   await prisma.user.update({
     where: { id: userId },

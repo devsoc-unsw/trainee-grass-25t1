@@ -97,15 +97,6 @@ export async function authRegister(
 
   return {
     token,
-    user: {
-      id: user.id,
-      name: user.name,
-      email: user.email,
-      username: user.username,
-      activeAvatar: "default-avatar-id",
-      activeBackground: "default-background-id",
-      leetcodeHandle: user.leetcodeHandle,
-      password: user.password,
-    }
+    user,
   }
 }

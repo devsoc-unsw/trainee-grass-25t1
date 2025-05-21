@@ -14,39 +14,33 @@ datasource db {
 }
 
 model User {
-    id                     String               @id @default(uuid())
-    name                   String
-    email                  String               @unique
-    username               String               @unique
-    password               String
-    leetcodeHandle         String              @unique
-    leetcodeStats          LeetCodeStats?     
-    solvedProblems         LeetCodeProblemsSolved[]
-    levels                 Int                  @default(1)
-    streaks                Int                  @default(0)
-    xp                     Int                  @default(0)
-    remainingLoginAttempts Int                  @default(5)
-    activeAvatarId         String
-    activeAvatar           Avatar               @relation(fields: [activeAvatarId], references: [id], onDelete: Cascade)
-    activeBackgroundId     String
-    activeBackground       Background           @relation(fields: [activeBackgroundId], references: [id], onDelete: Cascade)
-    tokens                 Token[]
-    avatarUnlocked         AvatarUnlocked[]
-    backgroundUnlocked     BackgroundUnlocked[]
-}
+  id                     String               @id @default(uuid())
+  name                   String
+  email                  String               @unique
+  username               String               @unique
+  password               String
+  leetcodeHandle         String               @unique
 
-model LeetCodeStats {
-    id              String             @id @default(uuid())
-    userId          String             @unique
-    totalSolved     Int                @default(0)
-    easySolved      Int                @default(0)
-    mediumSolved    Int                @default(0)
-    hardSolved      Int                @default(0)
-    ranking         Int                @default(0)
-    lastUpdated     DateTime           @updatedAt
-    user            User               @relation(fields: [userId], references: [id], onDelete: Cascade)
+  totalSolved            Int                  @default(0)
+  easySolved             Int                  @default(0)
+  mediumSolved           Int                  @default(0)
+  hardSolved             Int                  @default(0)
+  ranking                Int                  @default(0)
+  leetcodeLastUpdated    DateTime             @updatedAt
 
-    @@index([userId])
+  solvedProblems         LeetCodeProblemsSolved[]
+  levels                 Int                  @default(1)
+  streaks                Int                  @default(0)
+  xp                     Int                  @default(0)
+  remainingLoginAttempts Int                  @default(5)
+
+  activeAvatarId         String
+  activeAvatar           Avatar               @relation(fields: [activeAvatarId], references: [id], onDelete: Cascade)
+  activeBackgroundId     String
+  activeBackground       Background           @relation(fields: [activeBackgroundId], references: [id], onDelete: Cascade)
+  tokens                 Token[]
+  avatarUnlocked         AvatarUnlocked[]
+  backgroundUnlocked     BackgroundUnlocked[]
 }
 
 model LeetCodeProblemsSolved {
