@@ -94,7 +94,7 @@ export async function checkBlockedAccount(email: string): Promise<boolean> {
 }
 
 ///////////////////////// LeetCode handling /////////////////////////
-export async function validateLeetcodeSession(leetcodeSessionCookie: string): Promise<any | null> {
+export async function getUser(leetcodeSessionCookie: string): Promise<any | null> {
   //TODO: Remove after testing stages
   if (leetcodeSessionCookie === 'MOCK_COOKIE') {
     // Simulate a successful response

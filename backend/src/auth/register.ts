@@ -1,5 +1,5 @@
 import { 
-  validateLeetcodeSession,
+  getUser,
   storeLeetcodeStats,
   updateUserXP,
   updateUserLevel,
@@ -14,7 +14,7 @@ export async function authRegister(
   leetcodeSessionCookie: string
 ) {
   // Error Handling
-  const userData = await validateLeetcodeSession(leetcodeSessionCookie);
+  const userData = await getUser(leetcodeSessionCookie);
 
   if (!userData) {
     throw {
