@@ -9,21 +9,6 @@ const prisma = new PrismaClient();
 const LEETCODE_API_ENDPOINT = 'https://leetcode.com/graphql';
 
 
-export async function checkEmailExists(email: string): Promise<boolean> {
-  const res = await prisma.user
-    .findFirst({
-      where: {
-        email: email,
-      },
-    })
-    .catch((e) => {
-      console.error(e.message);
-    });
-
-  if (res === null) return false;
-  else return true;
-}
-
 export async function checkUsernameExists(username: string): Promise<boolean> {
   const res = await prisma.user
     .findFirst({
@@ -39,51 +24,10 @@ export async function checkUsernameExists(username: string): Promise<boolean> {
   else return true;
 }
 
-export async function verifyLogin(
-  email: string,
-  password: string
-): Promise<boolean> {
+export async function checkBlockedAccount(username: string): Promise<boolean> {
   const user = await prisma.user.findFirst({
     where: {
-      email: email,
-    },
-  });
-
-  if (user === null) return false;
-
-  // If password is correct, reset the remainingLoginAttempts to 3
-  // If the password is incorrect, subtract the remainingLoginAttempts by 1
-  if (user.password === getHash(password)) {
-    await prisma.user.update({
-      where: {
-        email: email,
-      },
-      data: {
-        remainingLoginAttempts: 3,
-      },
-    });
-
-    return true;
-  } else {
-    await prisma.user.update({
-      where: {
-        email: email,
-      },
-      data: {
-        remainingLoginAttempts: {
-          decrement: 1,
-        },
-      },
-    });
-
-    return false;
-  }
-}
-
-export async function checkBlockedAccount(email: string): Promise<boolean> {
-  const user = await prisma.user.findFirst({
-    where: {
-      email: email,
+      username: username,
     },
   });
 
