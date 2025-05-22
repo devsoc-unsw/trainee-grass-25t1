@@ -5,6 +5,8 @@ import GameController from "./GameController";
 import AvatarOptions from "./components/huds/AvatarOptions";
 import { BackgroundName, SpriteName } from "./gameAssets";
 import BackgroundOptions from "./components/huds/BackgroundOptions";
+import Leaderboard from "./components/huds/leaderboard/LeaderboardDialog";
+import LeaderboardDialog from "./components/huds/leaderboard/LeaderboardDialog";
 
 export default function Game() {
   // States
@@ -74,7 +76,7 @@ export default function Game() {
 
   return (
     <div className="overflow-hidden relative flex items-center justify-center">
-      <nav className="absolute top-0 flex justify-between p-4">
+      <nav className="absolute top-0 flex justify-between p-4 w-full">
         {/* TODO: Left section of Navbar */}
         <div className="flex gap-2 items-center">
           <AvatarOptions avatar={avatar} setAvatar={setAvatar} />
@@ -84,7 +86,9 @@ export default function Game() {
           />
         </div>
         {/* TODO: Right section of Navbar */}
-        <div className="flex gap-2 items-center"></div>
+        <div className="flex gap-2 items-center">
+          <LeaderboardDialog />
+        </div>
       </nav>
       <canvas ref={canvasRef} id="game" />
     </div>
