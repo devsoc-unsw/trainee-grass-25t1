@@ -4,6 +4,7 @@
 @theme inline {
   --color-background: var(--background);
   --color-foreground: var(--foreground);
+  --color-accent: var(--accent);
   --font-pixelify: var(--font-pixelify-sans);
   --radius-sm: calc(var(--radius) - 4px);
   --radius-md: calc(var(--radius) - 2px);
@@ -15,6 +16,7 @@
   --radius: 0.625rem;
   --background: #ffffff;
   --foreground: #000000;
+  --accent: #f0f0f0;
 }
 
 body {

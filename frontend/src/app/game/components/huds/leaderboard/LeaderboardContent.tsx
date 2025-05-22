@@ -5,6 +5,7 @@ import { useState } from "react";
 import ChevronLeft from "@/components/icons/ChevronLeft";
 import ChevronRight from "@/components/icons/ChevronRight";
 import LeaderboardNumberedInput from "./LeaderboardNumberedInput";
+import LeaderboardSkeleton from "./LeaderboardSkeleton";
 
 type LeaderboardEntry = {
   rank: number;
@@ -58,7 +59,7 @@ export default function LeaderboardContent() {
           inLeaderboard={false}
         />
       </div>
-      <div className="flex justify-between">
+      <div className="flex justify-between items-center">
         {/* Navigation Utilities */}
         <button onClick={setPreviousPage}>
           <ChevronLeft width={24} height={24} />

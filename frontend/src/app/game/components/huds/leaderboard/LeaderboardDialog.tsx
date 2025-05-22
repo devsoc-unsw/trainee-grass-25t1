@@ -8,6 +8,7 @@ import Trophy from "@/components/icons/Trophy";
 import GameButton from "../../GameButton";
 import { Suspense } from "react";
 import LeaderboardContent from "./LeaderboardContent";
+import LeaderboardSkeleton from "./LeaderboardSkeleton";
 
 export default function LeaderboardDialog() {
   return (
@@ -23,7 +24,7 @@ export default function LeaderboardDialog() {
         </DialogTitle>
         {/* Leaderboard Content */}
         {/* TODO: Change fallback to a proper skeleton */}
-        <Suspense fallback={<div>Loading...</div>}>
+        <Suspense fallback={<LeaderboardSkeleton />}>
           <LeaderboardContent />
         </Suspense>
       </DialogContent>
