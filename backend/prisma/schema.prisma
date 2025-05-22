@@ -16,7 +16,6 @@ datasource db {
 model User {
   id                     String               @id @default(uuid())
   name                   String
-  email                  String               @unique
   username               String               @unique
   password               String
   leetcodeHandle         String               @unique
@@ -28,7 +27,7 @@ model User {
   ranking                Int                  @default(0)
   leetcodeLastUpdated    DateTime             @updatedAt
 
-  solvedProblems         LeetCodeProblemsSolved[]
+  solvedProblems         UserSolvedLeetcodeProblems[]
   levels                 Int                  @default(1)
   streaks                Int                  @default(0)
   xp                     Int                  @default(0)
@@ -43,18 +42,23 @@ model User {
   backgroundUnlocked     BackgroundUnlocked[]
 }
 
-model LeetCodeProblemsSolved {
-    id             String              @id @default(uuid())
-    userId         String              
-    problemId      Int                 
-    titleSlug      String
-    title          String
-    difficulty     String
-    completedAt    DateTime           @default(now())
-    user           User               @relation(fields: [userId], references: [id], onDelete: Cascade)
+model LeetcodeProblem {
+  id                   String                      @id @default(uuid())
+  titleSlug            String                      @unique
+  title                String
+  difficulty           String
+  solvedBy             UserSolvedLeetcodeProblems[] // THIS IS OPTIONAL
+}
 
-    @@unique([userId, problemId])
-    @@index([userId])
+model UserSolvedLeetcodeProblems {
+  id         String          @id @default(uuid())
+  userId     String
+  problemId  String
+  completedAt DateTime       @default(now())
+  user       User            @relation(fields: [userId], references: [id], onDelete: Cascade)
+  problem    LeetcodeProblem @relation(fields: [problemId], references: [id], onDelete: Cascade)
+
+  @@unique([userId, problemId])
 }
 
 model Avatar {
