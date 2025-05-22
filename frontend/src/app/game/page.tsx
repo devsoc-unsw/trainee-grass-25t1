@@ -74,7 +74,7 @@ export default function Game() {
   }, [gameController, avatar]);
 
   return (
-    <div className="overflow-hidden relative flex items-center justify-center">
+    <div className="bg-foreground overflow-hidden relative flex items-center justify-center">
       <nav className="absolute top-0 flex justify-between p-4 w-full">
         {/* TODO: Left section of Navbar */}
         <div className="flex gap-2 items-center">
