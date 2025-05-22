@@ -180,3 +180,39 @@ export function getLevelFromXP(xp: number): number {
   }
   return level;
 }
+
+export async function upsertDefaults() {
+  const avatars = [
+    {
+      name: "default",
+      imageUrl: "/sprites/default.png",
+      unlockRequirement: 0,
+    },
+  ];
+
+  for (const avatar of avatars) {
+    await prisma.avatar.upsert({
+      where: { name: avatar.name },
+      update: {},
+      create: avatar,
+    });
+  }
+
+  // Default Backgrounds
+  const backgrounds = [
+    {
+      name: "mountain",
+      imageUrl: "/backgrounds/mountain.png",
+      unlockRequirement: 0,
+    },
+  ];
+
+  for (const background of backgrounds) {
+    await prisma.background.upsert({
+      where: { name: background.name },
+      update: {},
+      create: background,
+    });
+  }
+
+}

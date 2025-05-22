@@ -15,6 +15,7 @@ import { deleteToken, generateToken } from "./helper/tokenHelper";
 // Route imports
 import { authRegister } from "./auth/register";
 import { authLogout } from "./auth/logout";
+import { upsertDefaults } from "./helper/authHelper";
 
 // Database client
 const prisma = new PrismaClient();
@@ -125,7 +126,13 @@ app.use(errorHandler());
 
 // Start server
 const server = httpServer.listen(PORT, () => {
-  console.log(`⚡️ Server listening on port ${PORT}`);
+  try {
+    upsertDefaults(); // Upsert defaults on server startup
+    console.log(`⚡️ Server listening on port ${PORT}`);
+  } catch (error) {
+    console.error("Error upserting defaults:", error);
+    process.exit(1); // Stop server if defaults fail to insert
+  }
 });
 
 // For coverage, handle Ctrl+C

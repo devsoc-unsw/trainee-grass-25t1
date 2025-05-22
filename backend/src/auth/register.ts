@@ -45,24 +45,12 @@ export async function authRegister(
     };
   }
 
-  const defaultAvatar = await prisma.avatar.upsert({
+  const defaultAvatar = await prisma.avatar.findUnique({
     where: { name: "default" },
-    update: {},
-    create: {
-      name: "default",
-      imageUrl: "/sprites/default.png",
-      unlockRequirement: 0,
-    },
   });
-  
-  const defaultBackground = await prisma.background.upsert({
+
+  const defaultBackground = await prisma.background.findUnique({
     where: { name: "mountain" },
-    update: {},
-    create: {
-      name: "mountain",
-      imageUrl: "/backgrounds/mountain.png",
-      unlockRequirement: 0,
-    },
   });
   
   if (!defaultAvatar || !defaultBackground) {
