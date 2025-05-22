@@ -16,7 +16,8 @@ export default function useRequest(url: string) {
       headers: {
         "Content-Type": "application/json",
       },
-    }).then((r) => r.json())
+    }).then((r) => r.json()),
+    { suspense: true }
   );
 
   return { data, error, isLoading, isValidating };
@@ -28,10 +29,14 @@ export async function request(
   body?: Record<string, unknown>
 ) {
   try {
+    console.log(process.env.NEXT_PUBLIC_BASE_URL + url);
     const response = await fetch(process.env.NEXT_PUBLIC_BASE_URL + url, {
       method,
       credentials: "include",
       body: JSON.stringify(body),
+      headers: {
+        "Content-Type": "application/json",
+      },
     });
 
     const data = await response.json().catch(() => null);
