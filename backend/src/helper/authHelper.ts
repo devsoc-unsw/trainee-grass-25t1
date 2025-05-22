@@ -229,7 +229,7 @@ export function calculateXP(easySolved: number, mediumSolved: number, hardSolved
   return xp;
 }
 
-export async function updateUserXP(userId: string) {
+export async function updateUserXPAndLevel(userId: string) {
   const user = await getUserById(userId);
 
   if (!user) return 0;
@@ -241,7 +241,15 @@ export async function updateUserXP(userId: string) {
     data: { xp },
   });
 
-  return xp;
+  const level = getLevelFromXP(xp);
+
+  await prisma.user.update({
+    where: { id: userId },
+    data: {
+      xp,
+      levels: level,
+    },
+  });
 }
 
 // level handling
@@ -262,19 +270,5 @@ export function getLevelFromXP(xp: number): number {
       break;
     }
   }
-  return level;
-}
-
-export async function updateUserLevel(userId: string, xp: number, prisma: PrismaClient) {
-  const level = getLevelFromXP(xp);
-
-  await prisma.user.update({
-    where: { id: userId },
-    data: {
-      xp,
-      levels: level,
-    },
-  });
-
   return level;
 }

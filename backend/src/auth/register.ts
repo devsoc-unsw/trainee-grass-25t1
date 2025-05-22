@@ -1,8 +1,7 @@
 import { 
   getUser,
   storeLeetcodeStats,
-  updateUserXP,
-  updateUserLevel,
+  updateUserXPAndLevel,
 } from "../helper/authHelper";
 import { generateToken } from "../helper/tokenHelper";
 import { getHash } from "../helper/util";
@@ -25,7 +24,6 @@ export async function authRegister(
 
   const username = userData.username;
   const name = userData.profile?.realName?.trim() || username;
-  const email = `${username}@leetcode.local`;
   const password = crypto.randomUUID();
   const hashedPassword = getHash(password);
 
@@ -34,14 +32,12 @@ export async function authRegister(
   });
   if (existingUser) {
     const token = generateToken(existingUser.id);
-    const newXP = await updateUserXP(existingUser.id);
-    updateUserLevel(existingUser.id, newXP, prisma);
+    await updateUserXPAndLevel(existingUser.id);
     return {
       token,
       user: {
         id: existingUser.id,
         name: existingUser.name,
-        email: existingUser.email,
         username: existingUser.username,
         activeAvatar: existingUser.activeAvatarId,
         activeBackground: existingUser.activeBackgroundId,
@@ -77,7 +73,6 @@ export async function authRegister(
   const user = await prisma.user.create({
     data: {
       name,
-      email,
       username,
       password: hashedPassword,
       leetcodeHandle: username,
@@ -89,14 +84,18 @@ export async function authRegister(
   await storeLeetcodeStats(user.id, userData, leetcodeSessionCookie);
 
   // XP and levels handling
-  const newXP = await updateUserXP(user.id);
-  updateUserLevel(user.id, newXP, prisma);
+  updateUserXPAndLevel(user.id);
 
 
   const token = generateToken(user.id);
 
   return {
     token,
-    user,
+    userId: user.id,
+    name: user.name,
+    username: user.username,
+    activeAvatar: user.activeAvatarId,
+    activeBackground: user.activeBackgroundId,
+    leetcodeHandle: user.leetcodeHandle,
   }
 }
