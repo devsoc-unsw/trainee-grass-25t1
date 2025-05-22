@@ -5,7 +5,6 @@ import { useState } from "react";
 import ChevronLeft from "@/components/icons/ChevronLeft";
 import ChevronRight from "@/components/icons/ChevronRight";
 import LeaderboardNumberedInput from "./LeaderboardNumberedInput";
-import LeaderboardSkeleton from "./LeaderboardSkeleton";
 
 type LeaderboardEntry = {
   rank: number;
@@ -27,7 +26,7 @@ export default function LeaderboardContent() {
   if (error) {
     return (
       <p className="text-center">
-        There's something wrong. Please try again later.
+        There&apos;s something wrong. Please try again later.
       </p>
     );
   }

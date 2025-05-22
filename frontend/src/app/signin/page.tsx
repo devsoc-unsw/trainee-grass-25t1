@@ -11,7 +11,7 @@ export default function Page() {
   const handleOnSubmit = async (e: FormEvent) => {
     e.preventDefault();
 
-    const { data, error } = await request("POST", "/auth/register", {
+    const { error } = await request("POST", "/auth/register", {
       leetcodeSessionCookie: input,
     });
 
