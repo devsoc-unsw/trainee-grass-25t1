@@ -49,43 +49,51 @@ app.get("/", async (req: Request, res: Response) => {
 });
 
 // AUTH ROUTES
-app.post("/auth/register", async (req: Request, res: Response): Promise<any> => {
-  try {
-    const { leetcodeSessionCookie } = req.body;
-    if (!leetcodeSessionCookie) {
-      return res.status(400).json({ error: "LeetCode session cookie required."});
+app.post(
+  "/auth/register",
+  async (req: Request, res: Response): Promise<any> => {
+    try {
+      const { leetcodeSessionCookie } = req.body;
+      if (!leetcodeSessionCookie) {
+        return res
+          .status(400)
+          .json({ error: "LeetCode session cookie required." });
+      }
+      const { token, user } = await authRegister(leetcodeSessionCookie);
+
+      // Assign cookies
+      res.cookie("accessToken", (await token).accessToken, {
+        httpOnly: isProduction,
+        path: "/",
+        secure: isProduction,
+        domain: COOKIES_DOMAIN,
+        maxAge: 1800000,
+      });
+      res.cookie("refreshToken", (await token).refreshToken, {
+        httpOnly: isProduction,
+        path: "/",
+        secure: isProduction,
+        domain: COOKIES_DOMAIN,
+        maxAge: 7776000000,
+      });
+
+      res.header("Access-Control-Allow-Credentials", "true");
+
+      res
+        .status(200)
+        .json({
+          userId: user.id,
+          userName: user.name,
+          userUsername: user.username,
+        });
+    } catch (error: any) {
+      console.error(error);
+      res
+        .status(error.status || 500)
+        .json({ error: error.message || "An error occurred." });
     }
-    const { token , user } =
-      await authRegister( leetcodeSessionCookie );
-
-    // Assign cookies
-    res.cookie("accessToken", (await token).accessToken, {
-      httpOnly: isProduction,
-      path: "/",
-      secure: isProduction,
-      domain: COOKIES_DOMAIN,
-      maxAge: 1800000,
-    });
-    res.cookie("refreshToken", (await token).refreshToken, {
-      httpOnly: isProduction,
-      path: "/",
-      secure: isProduction,
-      domain: COOKIES_DOMAIN,
-      maxAge: 7776000000,
-    });
-
-    res.header("Access-Control-Allow-Credentials", "true");
-
-    res
-      .status(200)
-      .json({ userId: user.id, userName: user.name, userUsername: user.username });
-  } catch (error: any) {
-    console.error(error);
-    res
-      .status(error.status || 500)
-      .json({ error: error.message || "An error occurred." });
   }
-});
+);
 
 app.post(
   "/auth/logout",
@@ -220,10 +228,8 @@ async function authenticateToken(
     }
 
     // For any other errors
-    res
-      .status(500)
-      .json({
-        error: "An unexpected error occurred when authenticating token.",
-      });
+    res.status(500).json({
+      error: "An unexpected error occurred when authenticating token.",
+    });
   }
 }

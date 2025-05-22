@@ -1,16 +1,13 @@
-import { 
+import {
   getUserAndStoreStats,
   updateUserXPAndLevel,
 } from "../helper/authHelper";
 import { generateToken } from "../helper/tokenHelper";
-import { getHash } from "../helper/util";
 
 import { PrismaClient } from "@prisma/client";
 const prisma = new PrismaClient();
 
-export async function authRegister(
-  leetcodeSessionCookie: string
-) {
+export async function authRegister(leetcodeSessionCookie: string) {
   // Error Handling
   const userData = await getUserAndStoreStats(leetcodeSessionCookie);
 
@@ -18,7 +15,7 @@ export async function authRegister(
     throw {
       status: 400,
       message: "Invalid LeetCode session. Please check and try again.",
-    }
+    };
   }
 
   const username = userData.username;
@@ -50,7 +47,7 @@ export async function authRegister(
   const defaultBackground = await prisma.background.findUnique({
     where: { name: "mountain" },
   });
-  
+
   if (!defaultAvatar || !defaultBackground) {
     throw new Error("Default avatar or background not found");
   }
@@ -68,7 +65,6 @@ export async function authRegister(
   // XP and levels handling
   await updateUserXPAndLevel(user.id);
 
-
   const token = generateToken(user.id);
 
   return {
@@ -80,6 +76,6 @@ export async function authRegister(
       activeAvatar: user.activeAvatarId,
       activeBackground: user.activeBackgroundId,
       leetcodeHandle: user.leetcodeHandle,
-    }
-  }
+    },
+  };
 }
