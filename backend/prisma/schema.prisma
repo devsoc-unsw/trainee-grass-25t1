@@ -19,6 +19,9 @@ model User {
     email                  String               @unique
     username               String               @unique
     password               String
+    leetcodeHandle         String              @unique
+    leetcodeStats          LeetCodeStats?     
+    solvedProblems         LeetCodeProblemsSolved[]
     levels                 Int                  @default(1)
     streaks                Int                  @default(0)
     xp                     Int                  @default(0)
@@ -30,6 +33,34 @@ model User {
     tokens                 Token[]
     avatarUnlocked         AvatarUnlocked[]
     backgroundUnlocked     BackgroundUnlocked[]
+}
+
+model LeetCodeStats {
+    id              String             @id @default(uuid())
+    userId          String             @unique
+    totalSolved     Int                @default(0)
+    easySolved      Int                @default(0)
+    mediumSolved    Int                @default(0)
+    hardSolved      Int                @default(0)
+    ranking         Int                @default(0)
+    lastUpdated     DateTime           @updatedAt
+    user            User               @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+    @@index([userId])
+}
+
+model LeetCodeProblemsSolved {
+    id             String              @id @default(uuid())
+    userId         String              
+    problemId      Int                 
+    titleSlug      String
+    title          String
+    difficulty     String
+    completedAt    DateTime           @default(now())
+    user           User               @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+    @@unique([userId, problemId])
+    @@index([userId])
 }
 
 model Avatar {
