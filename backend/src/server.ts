@@ -15,6 +15,7 @@ import { deleteToken, generateToken } from "./helper/tokenHelper";
 // Route imports
 import { authRegister } from "./auth/register";
 import { authLogout } from "./auth/logout";
+import { getLeaderboard } from "./leaderboard/getLeaderboard";
 
 // Database client
 const prisma = new PrismaClient();
@@ -33,10 +34,12 @@ app.use(
   })
 );
 
+// Constants
 const PORT: number = parseInt(process.env.PORT || "3000");
 const isProduction: boolean = process.env.NODE_ENV === "production";
-const COOKIES_SAME_SITE = process.env.COOKIES_SAME_SITE as any;
 const COOKIES_DOMAIN = isProduction ? "" : ".localhost"; // TODO: COOKIES DOMAIN FOR DEPLOYMENT
+const DEFAULT_PAGE_NUMBER = 1;
+const DEFAULT_PAGE_SIZE = 5;
 
 ///////////////////////// ROUTES /////////////////////////
 
@@ -49,45 +52,49 @@ app.get("/", async (req: Request, res: Response) => {
 });
 
 // AUTH ROUTES
-app.post("/auth/register", async (req: Request, res: Response): Promise<any> => {
-  try {
-    const { leetcodeSessionCookie } = req.body;
-    if (!leetcodeSessionCookie) {
-      return res.status(400).json({ error: "LeetCode session cookie required."});
+app.post(
+  "/auth/register",
+  async (req: Request, res: Response): Promise<any> => {
+    try {
+      const { leetcodeSessionCookie } = req.body;
+      if (!leetcodeSessionCookie) {
+        return res
+          .status(400)
+          .json({ error: "LeetCode session cookie required." });
+      }
+      const { token, user } = await authRegister(leetcodeSessionCookie);
+
+      // Assign cookies
+      res.cookie("accessToken", (await token).accessToken, {
+        httpOnly: isProduction,
+        path: "/",
+        secure: isProduction,
+        domain: COOKIES_DOMAIN,
+        maxAge: 1800000,
+      });
+      res.cookie("refreshToken", (await token).refreshToken, {
+        httpOnly: isProduction,
+        path: "/",
+        secure: isProduction,
+        domain: COOKIES_DOMAIN,
+        maxAge: 7776000000,
+      });
+
+      res.header("Access-Control-Allow-Credentials", "true");
+
+      res.status(200).json({
+        userId: user.id,
+        userName: user.name,
+        userUsername: user.username,
+      });
+    } catch (error: any) {
+      console.error(error);
+      res
+        .status(error.status || 500)
+        .json({ error: error.message || "An error occurred." });
     }
-    const { token , user } =
-      await authRegister( leetcodeSessionCookie );
-
-    // Assign cookies
-    res.cookie("accessToken", (await token).accessToken, {
-      httpOnly: isProduction,
-      path: "/",
-      secure: isProduction,
-      sameSite: COOKIES_SAME_SITE,
-      domain: COOKIES_DOMAIN,
-      maxAge: 1800000,
-    });
-    res.cookie("refreshToken", (await token).refreshToken, {
-      httpOnly: isProduction,
-      path: "/",
-      secure: isProduction,
-      sameSite: COOKIES_SAME_SITE,
-      domain: COOKIES_DOMAIN,
-      maxAge: 7776000000,
-    });
-
-    res.header("Access-Control-Allow-Credentials", "true");
-
-    res
-      .status(200)
-      .json({ userId: user.id, userName: user.name, userUsername: user.username });
-  } catch (error: any) {
-    console.error(error);
-    res
-      .status(error.status || 500)
-      .json({ error: error.message || "An error occurred." });
   }
-});
+);
 
 app.post(
   "/auth/logout",
@@ -107,6 +114,37 @@ app.post(
       });
 
       res.sendStatus(200);
+    } catch (error: any) {
+      console.error(error);
+      res
+        .status(error.status || 500)
+        .json({ error: error.message || "An error occurred." });
+    }
+  }
+);
+
+// LEADERBOARD ROUTE
+app.get(
+  "/leaderboard",
+  authenticateToken,
+  async (
+    req: Request<{}, {}, {}, { page?: string; size?: string }>,
+    res: Response
+  ) => {
+    try {
+      const userId = res.locals.userId;
+
+      // Parse query parameters
+      const page = req.query.page
+        ? Math.max(1, parseInt(req.query.page, 10))
+        : DEFAULT_PAGE_NUMBER;
+      const size = req.query.size
+        ? Math.max(1, parseInt(req.query.size, 10))
+        : DEFAULT_PAGE_SIZE;
+
+      // Send leaderboard response
+      const leaderboard = await getLeaderboard(userId, page, size);
+      res.status(200).json(leaderboard);
     } catch (error: any) {
       console.error(error);
       res
@@ -194,7 +232,6 @@ async function authenticateToken(
           httpOnly: isProduction,
           path: "/",
           secure: isProduction,
-          sameSite: COOKIES_SAME_SITE,
           domain: COOKIES_DOMAIN,
           maxAge: 1800000,
         });
@@ -202,7 +239,6 @@ async function authenticateToken(
           httpOnly: isProduction,
           path: "/",
           secure: isProduction,
-          sameSite: COOKIES_SAME_SITE,
           domain: COOKIES_DOMAIN,
           maxAge: 7776000000,
         });
@@ -218,10 +254,8 @@ async function authenticateToken(
     }
 
     // For any other errors
-    res
-      .status(500)
-      .json({
-        error: "An unexpected error occurred when authenticating token.",
-      });
+    res.status(500).json({
+      error: "An unexpected error occurred when authenticating token.",
+    });
   }
 }
