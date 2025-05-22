@@ -36,7 +36,6 @@ app.use(
 
 const PORT: number = parseInt(process.env.PORT || "3000");
 const isProduction: boolean = process.env.NODE_ENV === "production";
-const COOKIES_SAME_SITE = process.env.COOKIES_SAME_SITE as any;
 const COOKIES_DOMAIN = isProduction ? "" : ".localhost"; // TODO: COOKIES DOMAIN FOR DEPLOYMENT
 
 ///////////////////////// ROUTES /////////////////////////
@@ -64,7 +63,6 @@ app.post("/auth/register", async (req: Request, res: Response): Promise<any> => 
       httpOnly: isProduction,
       path: "/",
       secure: isProduction,
-      sameSite: COOKIES_SAME_SITE,
       domain: COOKIES_DOMAIN,
       maxAge: 1800000,
     });
@@ -72,7 +70,6 @@ app.post("/auth/register", async (req: Request, res: Response): Promise<any> => 
       httpOnly: isProduction,
       path: "/",
       secure: isProduction,
-      sameSite: COOKIES_SAME_SITE,
       domain: COOKIES_DOMAIN,
       maxAge: 7776000000,
     });
@@ -201,7 +198,6 @@ async function authenticateToken(
           httpOnly: isProduction,
           path: "/",
           secure: isProduction,
-          sameSite: COOKIES_SAME_SITE,
           domain: COOKIES_DOMAIN,
           maxAge: 1800000,
         });
@@ -209,7 +205,6 @@ async function authenticateToken(
           httpOnly: isProduction,
           path: "/",
           secure: isProduction,
-          sameSite: COOKIES_SAME_SITE,
           domain: COOKIES_DOMAIN,
           maxAge: 7776000000,
         });
