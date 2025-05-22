@@ -25,7 +25,7 @@ model User {
   mediumSolved           Int                  @default(0)
   hardSolved             Int                  @default(0)
   ranking                Int                  @default(0)
-  leetcodeLastUpdated    DateTime             @updatedAt
+  leetcodeLastUpdated   DateTime              @default(now()) @updatedAt
 
   solvedProblems         UserSolvedLeetcodeProblems[]
   levels                 Int                  @default(1)

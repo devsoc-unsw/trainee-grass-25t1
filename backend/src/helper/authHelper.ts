@@ -1,4 +1,3 @@
-import { getHash } from "./util";
 import axios from "axios";
 
 import { PrismaClient } from "@prisma/client";
@@ -38,7 +37,8 @@ export async function checkBlockedAccount(username: string): Promise<boolean> {
 }
 
 ///////////////////////// LeetCode handling /////////////////////////
-export async function getUser(leetcodeSessionCookie: string): Promise<any | null> {
+
+export async function getUserAndStoreStats(leetcodeSessionCookie: string): Promise<any | null> {
   //TODO: Remove after testing stages
   if (leetcodeSessionCookie === 'MOCK_COOKIE') {
     // Simulate a successful response
@@ -52,113 +52,77 @@ export async function getUser(leetcodeSessionCookie: string): Promise<any | null
     };
   }
   try {
-    const query = `
-      query getUserProfile($username: String!) {
-        matchedUser(username: $username) {
-          username
-          profile {
-            realName
-            userAvatar
-            school
+    const mRes = await axios.get("https://leetcode.com/api/problems/algorithms/", {
+      headers: {
+        Cookie: `LEETCODE_SESSION = ${leetcodeSessionCookie}`,
+      }
+    })
+    const username = mRes.data.user_name;
+    if (!username) return null;
+    const combinedQuery = `
+    query combinedUserProfile($username: String!) {
+      matchedUser(username: $username) {
+        username
+        profile {
+          realName
+          userAvatar
+          school
+          ranking
+        }
+        submitStats {
+          acSubmissionNum {
+            difficulty
+            count
+            submissions
           }
         }
       }
-    `;
-
-    const meRes = await axios.get("https://leetcode.com/api/problems/algorithms/", {
-      headers: {
-        Cookie: `LEETCODE_SESSION=${leetcodeSessionCookie}`,
-      },
-    });
-
-    const username = meRes.data.user_name;
-    if (!username) return null;
-
-    const response = await axios.post(
-      LEETCODE_API_ENDPOINT,
-      {
-        query,
-        variables: { username }, // pass username as variable
-      },
-      {
-        headers: {
-          'Content-Type': 'application/json',
-          'Cookie': `LEETCODE_SESSION=${leetcodeSessionCookie}`,
-        },
-        withCredentials: true,
-      }
-    );
-    // Check user exists in leetCode
-    const user = response.data.data?.matchedUser;
-    if (!user) {
-      return null;
     }
-    
-    return user;
-  } catch(error) {
-    console.error("Error validating user in leetcode", error);
+  `;
+
+  const response = await axios.post(
+    LEETCODE_API_ENDPOINT,
+    {
+      query: combinedQuery,
+      variables: { username },
+    },
+    {
+      headers: {
+        'Content-Type': 'application/json',
+        'Cookie': `LEETCODE_SESSION=${leetcodeSessionCookie}`,
+      },
+      withCredentials: true,
+    }
+  );
+
+  const data = response.data.data?.matchedUser;
+  if (!data) {
     return null;
   }
-}
 
-export async function storeLeetcodeStats(
-  userId: string,
-  validatedUser: any,
-  leetcodeSessionCookie: string
-) {
-  try {
-    if (!validatedUser || !validatedUser.username) return;
-    const query = `
-      query userPublicProfile($username: String!) {
-        matchedUser(username: $username) {
-          submitStats {
-            acSubmissionNum {
-              difficulty
-              count
-              submissions
-            }
-          }
-          profile {
-            ranking
-          }
-        }
-      }
-    `;
+  const userProfile = data.profile;
+  const findCount = (difficulty: string) => 
+    data.submitStats?.acSubmissionNum?.find((item: any) => item.difficulty === difficulty)?.count || 0;
+  const stats = {
+    totalSolved: findCount("All"),
+    easySolved: findCount("Easy"),
+    mediumSolved: findCount("Medium"),
+    hardSolved: findCount("Hard"),
+  };
 
-    const response = await axios.post(
-      LEETCODE_API_ENDPOINT,
-      {
-        query,
-        variables: { username: validatedUser.username },
-      },
-      {
-        headers: {
-          'Content-Type': 'application/json',
-          'Cookie': `LEETCODE_SESSION=${leetcodeSessionCookie}`,
-        },
-        withCredentials: true,
-      }
-    );
-
-    const statsData = response.data?.data?.matchedUser;
-    if (!statsData) return;
-
-    const findCount = (difficulty: string) =>
-      statsData.submitStats.acSubmissionNum.find((item: any) => item.difficulty === difficulty)?.count || 0;
-
-    await prisma.user.update({
-      where: { id: userId },
-      data: {
-        totalSolved: findCount("All"),
-        easySolved: findCount("Easy"),
-        mediumSolved: findCount("Medium"),
-        hardSolved: findCount("Hard"),
-        ranking: statsData.profile.ranking || 0,
-        leetcodeLastUpdated: new Date(),
-      },
-    });
-  } catch (error) {
-    console.error("Error storing LeetCode stats from validated user", error);
+  return {
+    username: data.username,
+    profile: {
+      realName: userProfile?.realName?.trim() || data.username,
+      userAvatar: userProfile?.userAvatar,
+      school: userProfile?.school,
+      ranking: userProfile?.ranking ?? 0,
+    },
+    stats,
+  };
+  } catch(error) {
+    console.error("Error fetching user in leetcode", error);
+    return null;
   }
 }
 

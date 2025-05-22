@@ -1,6 +1,5 @@
 import { 
-  getUser,
-  storeLeetcodeStats,
+  getUserAndStoreStats,
   updateUserXPAndLevel,
 } from "../helper/authHelper";
 import { generateToken } from "../helper/tokenHelper";
@@ -13,7 +12,7 @@ export async function authRegister(
   leetcodeSessionCookie: string
 ) {
   // Error Handling
-  const userData = await getUser(leetcodeSessionCookie);
+  const userData = await getUserAndStoreStats(leetcodeSessionCookie);
 
   if (!userData) {
     throw {
@@ -81,21 +80,21 @@ export async function authRegister(
     },
   });
 
-  await storeLeetcodeStats(user.id, userData, leetcodeSessionCookie);
-
   // XP and levels handling
-  updateUserXPAndLevel(user.id);
+  await updateUserXPAndLevel(user.id);
 
 
   const token = generateToken(user.id);
 
   return {
     token,
-    userId: user.id,
-    name: user.name,
-    username: user.username,
-    activeAvatar: user.activeAvatarId,
-    activeBackground: user.activeBackgroundId,
-    leetcodeHandle: user.leetcodeHandle,
+    user: {
+      id: user.id,
+      name: user.name,
+      username: user.username,
+      activeAvatar: user.activeAvatarId,
+      activeBackground: user.activeBackgroundId,
+      leetcodeHandle: user.leetcodeHandle,
+    }
   }
 }

@@ -4,7 +4,7 @@ import "dotenv/config";
 import crypto from "crypto";
 
 import { getHash } from "./util";
-import { getUserByEmail } from "./userHelper";
+import { getUserById } from "./userHelper";
 
 const prisma = new PrismaClient();
 
@@ -53,8 +53,8 @@ export async function deleteToken(refreshToken: string) {
   });
 }
 
-export async function deleteTokenFromEmail(email: string) {
-  const user = await getUserByEmail(email);
+export async function deleteTokenFromId(userId: string) {
+  const user = await getUserById(userId);
 
   if (user === null) return null;
 
