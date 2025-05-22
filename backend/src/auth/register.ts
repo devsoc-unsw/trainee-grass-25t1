@@ -23,8 +23,6 @@ export async function authRegister(
 
   const username = userData.username;
   const name = userData.profile?.realName?.trim() || username;
-  const password = crypto.randomUUID();
-  const hashedPassword = getHash(password);
 
   const existingUser = await prisma.user.findFirst({
     where: { username },
@@ -61,7 +59,6 @@ export async function authRegister(
     data: {
       name,
       username,
-      password: hashedPassword,
       leetcodeHandle: username,
       activeAvatarId: defaultAvatar.id,
       activeBackgroundId: defaultBackground.id,
