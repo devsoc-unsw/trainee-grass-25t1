@@ -36,6 +36,8 @@ export async function updateUserXPAndLevel(userId: string) {
       levels: level,
     },
   });
+
+  return { xp, level };
 }
 
 export function getLevelFromXP(xp: number): number {

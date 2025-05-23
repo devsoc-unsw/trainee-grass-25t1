@@ -28,6 +28,8 @@ export async function unlockAvatars(userId: string) {
   const eligibleAvatars = AVATARS.filter(
     (avatar) => avatar.unlockRequirement <= userXP
   );
+
+  // Create the records
   await prisma.avatarUnlocked.createMany({
     data: eligibleAvatars.map((avatar) => ({
       userId,
@@ -35,6 +37,18 @@ export async function unlockAvatars(userId: string) {
     })),
     skipDuplicates: true, // Skip duplicates if any
   });
+
+  // Fetch and return the created records in the desired format
+  const unlockedAvatars = await prisma.avatarUnlocked.findMany({
+    where: {
+      userId,
+    },
+    select: {
+      avatarName: true,
+    },
+  });
+
+  return unlockedAvatars;
 }
 
 export async function unlockBackgrounds(userId: string) {
@@ -44,6 +58,8 @@ export async function unlockBackgrounds(userId: string) {
   const eligibleBackgrounds = BACKGROUNDS.filter(
     (background) => background.unlockRequirement <= userXP
   );
+
+  // Create the records
   await prisma.backgroundUnlocked.createMany({
     data: eligibleBackgrounds.map((background) => ({
       userId,
@@ -51,4 +67,16 @@ export async function unlockBackgrounds(userId: string) {
     })),
     skipDuplicates: true, // Skip duplicates if any
   });
+
+  // Fetch and return the created records in the desired format
+  const unlockedBackgrounds = await prisma.backgroundUnlocked.findMany({
+    where: {
+      userId,
+    },
+    select: {
+      backgroundName: true,
+    },
+  });
+
+  return unlockedBackgrounds;
 }

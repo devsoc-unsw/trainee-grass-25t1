@@ -83,13 +83,7 @@ app.post(
 
       res.header("Access-Control-Allow-Credentials", "true");
 
-      res
-        .status(200)
-        .json({
-          id: user.id,
-          name: user.name,
-          username: user.username,
-        });
+      res.status(200).json(user);
     } catch (error: any) {
       console.error(error);
       res
