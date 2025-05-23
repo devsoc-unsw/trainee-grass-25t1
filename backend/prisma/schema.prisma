@@ -14,55 +14,33 @@ datasource db {
 }
 
 model User {
-  id                     String               @id @default(uuid())
-  name                   String
-  username               String               @unique
-  leetcodeHandle         String               @unique
+    id             String @id @default(uuid())
+    name           String
+    username       String @unique
+    leetcodeHandle String @unique
 
-  totalSolved            Int                  @default(0)
-  easySolved             Int                  @default(0)
-  mediumSolved           Int                  @default(0)
-  hardSolved             Int                  @default(0)
-  ranking                Int                  @default(0)
-  leetcodeLastUpdated   DateTime              @default(now()) @updatedAt
+    totalSolved         Int      @default(0)
+    easySolved          Int      @default(0)
+    mediumSolved        Int      @default(0)
+    hardSolved          Int      @default(0)
+    leetcodeLastUpdated DateTime @default(now()) @updatedAt
 
-  solvedProblems         UserSolvedLeetcodeProblems[]
-  levels                 Int                  @default(1)
-  streaks                Int                  @default(0)
-  xp                     Int                  @default(0)
-  remainingLoginAttempts Int                  @default(5)
+    levels                 Int @default(1)
+    streaks                Int @default(0)
+    xp                     Int @default(0)
+    remainingLoginAttempts Int @default(5)
 
-  activeAvatarId         String
-  activeAvatar           Avatar               @relation(fields: [activeAvatarId], references: [id], onDelete: Cascade)
-  activeBackgroundId     String
-  activeBackground       Background           @relation(fields: [activeBackgroundId], references: [id], onDelete: Cascade)
-  tokens                 Token[]
-  avatarUnlocked         AvatarUnlocked[]
-  backgroundUnlocked     BackgroundUnlocked[]
-}
-
-model LeetcodeProblem {
-  id                   String                      @id @default(uuid())
-  titleSlug            String                      @unique
-  title                String
-  difficulty           String
-  solvedBy             UserSolvedLeetcodeProblems[] // THIS IS OPTIONAL
-}
-
-model UserSolvedLeetcodeProblems {
-  id         String          @id @default(uuid())
-  userId     String
-  problemId  String
-  completedAt DateTime       @default(now())
-  user       User            @relation(fields: [userId], references: [id], onDelete: Cascade)
-  problem    LeetcodeProblem @relation(fields: [problemId], references: [id], onDelete: Cascade)
-
-  @@unique([userId, problemId])
+    activeAvatarName     String
+    activeAvatar         Avatar               @relation(fields: [activeAvatarName], references: [name], onDelete: Cascade)
+    activeBackgroundName String
+    activeBackground     Background           @relation(fields: [activeBackgroundName], references: [name], onDelete: Cascade)
+    tokens               Token[]
+    avatarUnlocked       AvatarUnlocked[]
+    backgroundUnlocked   BackgroundUnlocked[]
 }
 
 model Avatar {
-    id                String           @id @default(uuid())
-    name              String           @unique
+    name              String           @id @unique
     imageUrl          String
     unlockRequirement Int              @default(0)
     unlockedByUsers   AvatarUnlocked[]
@@ -70,8 +48,7 @@ model Avatar {
 }
 
 model Background {
-    id                String               @id @default(uuid())
-    name              String               @unique
+    name              String               @id @unique
     imageUrl          String
     unlockRequirement Int                  @default(0)
     unlockedByUsers   BackgroundUnlocked[]
@@ -79,21 +56,21 @@ model Background {
 }
 
 model AvatarUnlocked {
-    userId   String
-    user     User   @relation(fields: [userId], references: [id], onDelete: Cascade)
-    avatarId String
-    avatar   Avatar @relation(fields: [avatarId], references: [id], onDelete: Cascade)
+    userId     String
+    user       User   @relation(fields: [userId], references: [id], onDelete: Cascade)
+    avatarName String
+    avatar     Avatar @relation(fields: [avatarName], references: [name], onDelete: Cascade)
 
-    @@id([userId, avatarId])
+    @@id([userId, avatarName])
 }
 
 model BackgroundUnlocked {
-    userId       String
-    user         User       @relation(fields: [userId], references: [id], onDelete: Cascade)
-    backgroundId String
-    background   Background @relation(fields: [backgroundId], references: [id], onDelete: Cascade)
+    userId         String
+    user           User       @relation(fields: [userId], references: [id], onDelete: Cascade)
+    backgroundName String
+    background     Background @relation(fields: [backgroundName], references: [name], onDelete: Cascade)
 
-    @@id([userId, backgroundId])
+    @@id([userId, backgroundName])
 }
 
 model Token {
