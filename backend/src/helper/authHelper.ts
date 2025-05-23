@@ -2,6 +2,7 @@ import axios from "axios";
 
 import { PrismaClient } from "@prisma/client";
 import { getUserById } from "./userHelper";
+import { LEVEL_THRESHOLD } from "../constants/levels";
 const prisma = new PrismaClient();
 
 // Other constants
@@ -40,19 +41,8 @@ export async function checkBlockedAccount(username: string): Promise<boolean> {
 export async function getUserAndStoreStats(
   leetcodeSessionCookie: string
 ): Promise<any | null> {
-  //TODO: Remove after testing stages
-  if (leetcodeSessionCookie === "MOCK_COOKIE") {
-    // Simulate a successful response
-    return {
-      username: "mockUser",
-      profile: {
-        realName: "Mock Real Name",
-        userAvatar: "https://example.com/mock-avatar.png",
-        school: "Mock University",
-      },
-    };
-  }
   try {
+    // Validate leetcodeSessionCookie
     const mRes = await axios.get(
       "https://leetcode.com/api/problems/algorithms/",
       {
@@ -61,8 +51,11 @@ export async function getUserAndStoreStats(
         },
       }
     );
+
     const username = mRes.data.user_name;
     if (!username) return null;
+
+    // Get user data from LeetCode
     const combinedQuery = `
     query combinedUserProfile($username: String!) {
       matchedUser(username: $username) {
@@ -99,6 +92,7 @@ export async function getUserAndStoreStats(
       }
     );
 
+    // Return early if no user data is found from the leetcode API
     const data = response.data.data?.matchedUser;
     if (!data) {
       return null;
@@ -118,13 +112,9 @@ export async function getUserAndStoreStats(
 
     return {
       username: data.username,
-      profile: {
-        realName: userProfile?.realName?.trim() || data.username,
-        userAvatar: userProfile?.userAvatar,
-        school: userProfile?.school,
-        ranking: userProfile?.ranking ?? 0,
-      },
-      stats,
+      realName: userProfile?.realName?.trim() || data.username,
+      userAvatar: userProfile?.userAvatar,
+      ...stats,
     };
   } catch (error) {
     console.error("Error fetching user in leetcode", error);
@@ -153,7 +143,7 @@ export function calculateXP(
 export async function updateUserXPAndLevel(userId: string) {
   const user = await getUserById(userId);
 
-  if (!user) return 0;
+  if (!user) return;
 
   const xp = calculateXP(user.easySolved, user.mediumSolved, user.hardSolved);
   const level = getLevelFromXP(xp);
@@ -167,24 +157,24 @@ export async function updateUserXPAndLevel(userId: string) {
   });
 }
 
-// TODO: Level handling
-const levelThresholds = [
-  { level: 1, xp: 0 },
-  { level: 2, xp: 10 },
-  { level: 3, xp: 30 },
-  { level: 4, xp: 55 },
-  { level: 5, xp: 80 },
-];
-
 export function getLevelFromXP(xp: number): number {
-  let level = 1;
-  for (const threshold of levelThresholds) {
-    if (xp >= threshold.xp) {
-      level = threshold.level;
+  let start = 0,
+    end = LEVEL_THRESHOLD.length - 1;
+  let level = 1; // Default to level 1 if no threshold is met
+
+  while (start <= end) {
+    const mid = Math.floor((start + end) / 2);
+
+    if (LEVEL_THRESHOLD[mid].xp <= xp) {
+      // User has enough XP for this level
+      level = LEVEL_THRESHOLD[mid].level;
+      start = mid + 1; // Check if they can reach an even higher level
     } else {
-      break;
+      // User doesn't have enough XP for this level
+      end = mid - 1; // Check lower levels
     }
   }
+
   return level;
 }
 
@@ -222,4 +212,52 @@ export async function upsertDefaults() {
       create: background,
     });
   }
+}
+
+export async function unlockAvatar(userId: string, avatar: string) {
+  const targetAvatar = await prisma.avatar.findUnique({
+    where: { name: avatar },
+  });
+
+  if (!targetAvatar) return null;
+
+  await prisma.avatarUnlocked.upsert({
+    where: {
+      userId_avatarName: {
+        userId,
+        avatarName: targetAvatar.name,
+      },
+    },
+    update: {},
+    create: {
+      userId,
+      avatarName: targetAvatar.name,
+    },
+  });
+
+  return targetAvatar;
+}
+
+export async function unlockBackground(userId: string, background: string) {
+  const targetBackground = await prisma.background.findUnique({
+    where: { name: background },
+  });
+
+  if (!targetBackground) return null;
+
+  await prisma.backgroundUnlocked.upsert({
+    where: {
+      userId_backgroundName: {
+        userId,
+        backgroundName: targetBackground.name,
+      },
+    },
+    update: {},
+    create: {
+      userId,
+      backgroundName: targetBackground.name,
+    },
+  });
+
+  return targetBackground;
 }

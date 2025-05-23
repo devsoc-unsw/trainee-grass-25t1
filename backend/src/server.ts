@@ -16,6 +16,7 @@ import { deleteToken, generateToken } from "./helper/tokenHelper";
 import { authRegister } from "./auth/register";
 import { authLogout } from "./auth/logout";
 import { upsertDefaults } from "./helper/authHelper";
+import { getLeaderboard } from "./leaderboard/getLeaderboard";
 
 // Database client
 const prisma = new PrismaClient();
@@ -29,14 +30,17 @@ const httpServer = new Server(app);
 // Use middleware that allows for access from other domains
 app.use(
   cors({
-    origin: ["http://localhost:3030"],
+    origin: ["http://localhost:8080"],
     credentials: true,
   })
 );
 
+// Constants
 const PORT: number = parseInt(process.env.PORT || "3000");
 const isProduction: boolean = process.env.NODE_ENV === "production";
 const COOKIES_DOMAIN = isProduction ? "" : ".localhost"; // TODO: COOKIES DOMAIN FOR DEPLOYMENT
+const DEFAULT_PAGE_NUMBER = 1;
+const DEFAULT_PAGE_SIZE = 5;
 
 ///////////////////////// ROUTES /////////////////////////
 
@@ -113,6 +117,37 @@ app.post(
       });
 
       res.sendStatus(200);
+    } catch (error: any) {
+      console.error(error);
+      res
+        .status(error.status || 500)
+        .json({ error: error.message || "An error occurred." });
+    }
+  }
+);
+
+// LEADERBOARD ROUTE
+app.get(
+  "/leaderboard",
+  authenticateToken,
+  async (
+    req: Request<{}, {}, {}, { page?: string; size?: string }>,
+    res: Response
+  ) => {
+    try {
+      const userId = res.locals.userId;
+
+      // Parse query parameters
+      const page = req.query.page
+        ? Math.max(1, parseInt(req.query.page, 10))
+        : DEFAULT_PAGE_NUMBER;
+      const size = req.query.size
+        ? Math.max(1, parseInt(req.query.size, 10))
+        : DEFAULT_PAGE_SIZE;
+
+      // Send leaderboard response
+      const leaderboard = await getLeaderboard(userId, page, size);
+      res.status(200).json(leaderboard);
     } catch (error: any) {
       console.error(error);
       res
