@@ -60,7 +60,7 @@ export async function deleteTokenFromId(userId: string) {
 
   return await prisma.token.deleteMany({
     where: {
-      user: user,
+      id: user.id,
     },
   });
 }

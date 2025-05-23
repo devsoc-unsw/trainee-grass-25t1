@@ -1,10 +1,10 @@
 import AnimatedSpritePreview from "../../AnimatedSpritePreview";
 import { SPRITES_MAP } from "@/app/game/gameAssets";
-import useRequest from "@/lib/utils";
 import { useState } from "react";
 import ChevronLeft from "@/components/icons/ChevronLeft";
 import ChevronRight from "@/components/icons/ChevronRight";
 import LeaderboardNumberedInput from "./LeaderboardNumberedInput";
+import useRequest from "@/hooks/useRequest";
 
 type LeaderboardEntry = {
   rank: number;
