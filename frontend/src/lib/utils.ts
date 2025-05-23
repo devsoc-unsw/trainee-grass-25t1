@@ -29,7 +29,6 @@ export async function request(
   body?: Record<string, unknown>
 ) {
   try {
-    console.log(process.env.NEXT_PUBLIC_BASE_URL + url);
     const response = await fetch(process.env.NEXT_PUBLIC_BASE_URL + url, {
       method,
       credentials: "include",

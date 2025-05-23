@@ -1,11 +1,10 @@
 import axios from "axios";
 
 import { PrismaClient } from "@prisma/client";
-import { getUserById } from "./userHelper";
-import { LEVEL_THRESHOLD } from "../constants/levels";
+
 const prisma = new PrismaClient();
 
-// Other constants
+// Constants
 const LEETCODE_API_ENDPOINT = "https://leetcode.com/graphql";
 
 export async function checkUsernameExists(username: string): Promise<boolean> {
@@ -37,7 +36,6 @@ export async function checkBlockedAccount(username: string): Promise<boolean> {
 }
 
 ///////////////////////// LeetCode handling /////////////////////////
-
 export async function getUserAndStoreStats(
   leetcodeSessionCookie: string
 ): Promise<any | null> {
@@ -120,144 +118,4 @@ export async function getUserAndStoreStats(
     console.error("Error fetching user in leetcode", error);
     return null;
   }
-}
-
-///////////////////////// XP and level handling /////////////////////////
-export function calculateXP(
-  easySolved: number,
-  mediumSolved: number,
-  hardSolved: number
-): number {
-  const easyXP = 5;
-  const mediumXP = 10;
-  const hardXP = 20;
-
-  const xp =
-    (easySolved || 0) * easyXP +
-    (mediumSolved || 0) * mediumXP +
-    (hardSolved || 0) * hardXP;
-
-  return xp;
-}
-
-export async function updateUserXPAndLevel(userId: string) {
-  const user = await getUserById(userId);
-
-  if (!user) return;
-
-  const xp = calculateXP(user.easySolved, user.mediumSolved, user.hardSolved);
-  const level = getLevelFromXP(xp);
-
-  await prisma.user.update({
-    where: { id: userId },
-    data: {
-      xp,
-      levels: level,
-    },
-  });
-}
-
-export function getLevelFromXP(xp: number): number {
-  let start = 0,
-    end = LEVEL_THRESHOLD.length - 1;
-  let level = 1; // Default to level 1 if no threshold is met
-
-  while (start <= end) {
-    const mid = Math.floor((start + end) / 2);
-
-    if (LEVEL_THRESHOLD[mid].xp <= xp) {
-      // User has enough XP for this level
-      level = LEVEL_THRESHOLD[mid].level;
-      start = mid + 1; // Check if they can reach an even higher level
-    } else {
-      // User doesn't have enough XP for this level
-      end = mid - 1; // Check lower levels
-    }
-  }
-
-  return level;
-}
-
-// TODO: UPSERT ALL AVATARS AND BACKGROUNDS
-export async function upsertDefaults() {
-  const avatars = [
-    {
-      name: "default",
-      imageUrl: "/sprites/default.png",
-      unlockRequirement: 0,
-    },
-  ];
-
-  for (const avatar of avatars) {
-    await prisma.avatar.upsert({
-      where: { name: avatar.name },
-      update: {},
-      create: avatar,
-    });
-  }
-
-  // Default Backgrounds
-  const backgrounds = [
-    {
-      name: "mountain",
-      imageUrl: "/backgrounds/mountain.png",
-      unlockRequirement: 0,
-    },
-  ];
-
-  for (const background of backgrounds) {
-    await prisma.background.upsert({
-      where: { name: background.name },
-      update: {},
-      create: background,
-    });
-  }
-}
-
-export async function unlockAvatar(userId: string, avatar: string) {
-  const targetAvatar = await prisma.avatar.findUnique({
-    where: { name: avatar },
-  });
-
-  if (!targetAvatar) return null;
-
-  await prisma.avatarUnlocked.upsert({
-    where: {
-      userId_avatarName: {
-        userId,
-        avatarName: targetAvatar.name,
-      },
-    },
-    update: {},
-    create: {
-      userId,
-      avatarName: targetAvatar.name,
-    },
-  });
-
-  return targetAvatar;
-}
-
-export async function unlockBackground(userId: string, background: string) {
-  const targetBackground = await prisma.background.findUnique({
-    where: { name: background },
-  });
-
-  if (!targetBackground) return null;
-
-  await prisma.backgroundUnlocked.upsert({
-    where: {
-      userId_backgroundName: {
-        userId,
-        backgroundName: targetBackground.name,
-      },
-    },
-    update: {},
-    create: {
-      userId,
-      backgroundName: targetBackground.name,
-    },
-  });
-
-  return targetBackground;
 }

@@ -15,8 +15,8 @@ import { deleteToken, generateToken } from "./helper/tokenHelper";
 // Route imports
 import { authRegister } from "./auth/register";
 import { authLogout } from "./auth/logout";
-import { upsertDefaults } from "./helper/authHelper";
 import { getLeaderboard } from "./leaderboard/getLeaderboard";
+import { upsertSprites } from "./helper/spriteHelper";
 
 // Database client
 const prisma = new PrismaClient();
@@ -86,9 +86,9 @@ app.post(
       res
         .status(200)
         .json({
-          userId: user.id,
-          userName: user.name,
-          userUsername: user.username,
+          id: user.id,
+          name: user.name,
+          username: user.username,
         });
     } catch (error: any) {
       console.error(error);
@@ -167,11 +167,11 @@ app.use(errorHandler());
 // Start server
 const server = httpServer.listen(PORT, () => {
   try {
-    upsertDefaults(); // Upsert defaults on server startup
+    upsertSprites(); // Upsert all sprites on server startup
     console.log(`⚡️ Server listening on port ${PORT}`);
   } catch (error) {
-    console.error("Error upserting defaults:", error);
-    process.exit(1); // Stop server if defaults fail to insert
+    console.error("Error upserting sprites:", error);
+    process.exit(1); // Stop server if sprites fail to insert
   }
 });
 

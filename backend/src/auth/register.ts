@@ -1,9 +1,6 @@
-import {
-  getUserAndStoreStats,
-  unlockAvatar,
-  unlockBackground,
-  updateUserXPAndLevel,
-} from "../helper/authHelper";
+import { getUserAndStoreStats } from "../helper/authHelper";
+import { updateUserXPAndLevel } from "../helper/levelHelper";
+import { unlockAvatars, unlockBackgrounds } from "../helper/spriteHelper";
 import { generateToken } from "../helper/tokenHelper";
 
 import { PrismaClient } from "@prisma/client";
@@ -63,18 +60,20 @@ export async function authRegister(leetcodeSessionCookie: string) {
       leetcodeHandle: username,
       activeAvatarName: defaultAvatar!.name,
       activeBackgroundName: defaultBackground!.name,
-      totalSolved: userData.numSolved,
+      totalSolved: userData.totalSolved,
       easySolved: userData.easySolved,
       mediumSolved: userData.mediumSolved,
       hardSolved: userData.hardSolved,
     },
   });
 
-  await unlockAvatar(user.id, defaultAvatar!.name);
-  await unlockBackground(user.id, defaultBackground!.name);
-
   const token = generateToken(user.id);
   await updateUserXPAndLevel(user.id);
+
+  // Unlock all avatars and backgrounds that can already be unlocked
+  await unlockAvatars(user.id);
+  await unlockBackgrounds(user.id);
+
   return {
     token,
     user: {
