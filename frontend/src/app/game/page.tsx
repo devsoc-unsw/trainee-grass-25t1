@@ -5,6 +5,8 @@ import GameController from "./GameController";
 import AvatarOptions from "./components/huds/AvatarOptions";
 import { BackgroundName, SpriteName } from "./gameAssets";
 import BackgroundOptions from "./components/huds/BackgroundOptions";
+import GameButton from "@/app/game/components/GameButton";
+import LevelMenu from "./components/huds/LevelMenu";
 
 export default function Game() {
   // States
@@ -82,6 +84,7 @@ export default function Game() {
             background={background}
             setBackground={setBackground}
           />
+          <LevelMenu />
         </div>
         {/* TODO: Right section of Navbar */}
         <div className="flex gap-2 items-center"></div>

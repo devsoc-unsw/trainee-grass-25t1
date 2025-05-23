@@ -16,6 +16,7 @@ import { deleteToken, generateToken } from "./helper/tokenHelper";
 import { authRegister } from "./auth/register";
 import { authLogout } from "./auth/logout";
 import { upsertDefaults } from "./helper/authHelper";
+import { syncUserProgress } from "./levels/syncUserProgress";
 
 // Database client
 const prisma = new PrismaClient();
@@ -79,13 +80,11 @@ app.post(
 
       res.header("Access-Control-Allow-Credentials", "true");
 
-      res
-        .status(200)
-        .json({
-          userId: user.id,
-          userName: user.name,
-          userUsername: user.username,
-        });
+      res.status(200).json({
+        userId: user.id,
+        userName: user.name,
+        userUsername: user.username,
+      });
     } catch (error: any) {
       console.error(error);
       res
@@ -118,6 +117,31 @@ app.post(
       res
         .status(error.status || 500)
         .json({ error: error.message || "An error occurred." });
+    }
+  }
+);
+
+// LEVELS ROUTE
+app.post(
+  "/sync-progress",
+  authenticateToken,
+  async (req: Request, res: Response) => {
+    const { userId, leetcodeHandle, leetcodeSessionCookie } = req.body;
+
+    if (!leetcodeSessionCookie) {
+      res.status(400).json({ error: "LeetCode session cookie required." });
+    }
+
+    try {
+      const result = await syncUserProgress(
+        userId,
+        leetcodeHandle,
+        leetcodeSessionCookie
+      );
+      res.status(200).json(result);
+    } catch (error: any) {
+      console.error("Sync failed:", error);
+      res.status(500).json({ error: error.message || "Internal server error" });
     }
   }
 );

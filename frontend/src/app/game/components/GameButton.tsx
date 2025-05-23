@@ -19,7 +19,7 @@ const GameButton = forwardRef<ComponentRef<"button">, NavbarButtonProps>(
           <TooltipTrigger asChild>
             <button
               ref={ref}
-              className="bg-background flex gap-2 border-4 border-foreground drop-shadow-[4px_4px_0_#000] hover:drop-shadow-[0_0_0_#000] hover:translate-x-1 hover:translate-y-1 transition-all duration-150 p-2 cursor-pointer outline-none"
+              className="bg-background flex gap-2 border-4 border-foreground drop-shadow-[4px_4px_0_#000] hover:drop-shadow-[0_0_0_#000] hover:translate-x-1 hover:translate-y-1 transition-all duration-150 p-2 h-14 items-center justify-center cursor-pointer outline-none"
               {...props}
             >
               {props.children}
