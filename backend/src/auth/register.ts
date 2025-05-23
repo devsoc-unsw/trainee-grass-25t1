@@ -7,6 +7,24 @@ import { PrismaClient } from "@prisma/client";
 import { createNewUser } from "../helper/userHelper";
 const prisma = new PrismaClient();
 
+export type UserResponse = {
+  id: string;
+  name: string;
+  username: string;
+  totalSolved: number;
+  easySolved: number;
+  mediumSolved: number;
+  hardSolved: number;
+  streaks: number;
+  levels: number;
+  xp: number;
+  activeAvatar: string;
+  activeBackground: string;
+  leetcodeHandle: string;
+  avatarUnlocked: string[];
+  backgroundUnlocked: string[];
+};
+
 export async function authRegister(leetcodeSessionCookie: string) {
   const userData = await getUserAndStoreStats(leetcodeSessionCookie);
 
@@ -37,7 +55,7 @@ export async function authRegister(leetcodeSessionCookie: string) {
   });
 
   if (existingUser) {
-    const token = generateToken(existingUser.id);
+    const token = await generateToken(existingUser.id);
     await updateUserXPAndLevel(existingUser.id);
     return {
       token,
@@ -87,7 +105,7 @@ export async function authRegister(leetcodeSessionCookie: string) {
     mediumSolved: userData.mediumSolved,
     hardSolved: userData.hardSolved,
   });
-  const token = generateToken(newUser.id);
+  const token = await generateToken(newUser.id);
 
   return {
     token,

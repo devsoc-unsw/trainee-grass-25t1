@@ -10,6 +10,18 @@ export async function getUserById(id: string) {
     where: {
       id: id,
     },
+    include: {
+      avatarUnlocked: {
+        select: {
+          avatarName: true,
+        },
+      },
+      backgroundUnlocked: {
+        select: {
+          backgroundName: true,
+        },
+      },
+    },
   });
 }
 
@@ -18,6 +30,18 @@ export async function getUserByUsername(username: string) {
   return await prisma.user.findUnique({
     where: {
       username: username,
+    },
+    include: {
+      avatarUnlocked: {
+        select: {
+          avatarName: true,
+        },
+      },
+      backgroundUnlocked: {
+        select: {
+          backgroundName: true,
+        },
+      },
     },
   });
 }
