@@ -6,6 +6,7 @@ import AvatarOptions from "./components/huds/AvatarOptions";
 import { BackgroundName, SpriteName } from "./gameAssets";
 import BackgroundOptions from "./components/huds/BackgroundOptions";
 import LeaderboardDialog from "./components/huds/leaderboard/LeaderboardDialog";
+import useAuth from "@/hooks/useAuth";
 
 export default function Game() {
   // States
@@ -15,6 +16,9 @@ export default function Game() {
 
   // Refs
   const canvasRef = useRef<HTMLCanvasElement>(null);
+
+  // User data
+  const { user } = useAuth();
 
   useEffect(() => {
     if (canvasRef.current) {
@@ -73,15 +77,31 @@ export default function Game() {
     gameController.changePlayer(avatar);
   }, [gameController, avatar]);
 
+  useEffect(() => {
+    if (user?.activeAvatar) {
+      setAvatar(user.activeAvatar as SpriteName);
+    }
+    if (user?.activeBackground) {
+      setBackground(user.activeBackground as BackgroundName);
+    }
+  }, [user]);
+
   return (
     <div className="bg-foreground overflow-hidden relative flex items-center justify-center">
       <nav className="absolute top-0 flex justify-between p-4 w-full">
         {/* TODO: Left section of Navbar */}
         <div className="flex gap-2 items-center">
-          <AvatarOptions avatar={avatar} setAvatar={setAvatar} />
+          <AvatarOptions
+            avatar={avatar}
+            setAvatar={setAvatar}
+            avatarsUnlocked={(user?.avatarUnlocked as SpriteName[]) || []}
+          />
           <BackgroundOptions
             background={background}
             setBackground={setBackground}
+            backgroundsUnlocked={
+              (user?.backgroundUnlocked as BackgroundName[]) || []
+            }
           />
         </div>
         {/* TODO: Right section of Navbar */}

@@ -17,6 +17,7 @@ import { authRegister } from "./auth/register";
 import { authLogout } from "./auth/logout";
 import { getLeaderboard } from "./leaderboard/getLeaderboard";
 import { upsertSprites } from "./helper/spriteHelper";
+import { getUserById } from "./helper/userHelper";
 
 // Database client
 const prisma = new PrismaClient();
@@ -84,6 +85,45 @@ app.post(
       res.header("Access-Control-Allow-Credentials", "true");
 
       res.status(200).json(user);
+    } catch (error: any) {
+      console.error(error);
+      res
+        .status(error.status || 500)
+        .json({ error: error.message || "An error occurred." });
+    }
+  }
+);
+
+app.get(
+  "/auth/me",
+  authenticateToken,
+  async (req: Request, res: Response): Promise<any> => {
+    try {
+      const userId = res.locals.userId;
+      const user = await getUserById(userId);
+      if (!user) {
+        res.status(400).json({ error: "User not found." });
+        return;
+      }
+      res.status(200).json({
+        id: user.id,
+        name: user.name,
+        username: user.username,
+        totalSolved: user.totalSolved,
+        easySolved: user.easySolved,
+        mediumSolved: user.mediumSolved,
+        hardSolved: user.hardSolved,
+        streaks: user.streaks,
+        levels: user.levels,
+        xp: user.xp,
+        activeAvatar: user.activeAvatarName,
+        activeBackground: user.activeBackgroundName,
+        leetcodeHandle: user.leetcodeHandle,
+        avatarUnlocked: user.avatarUnlocked.map((avatar) => avatar.avatarName),
+        backgroundUnlocked: user.backgroundUnlocked.map(
+          (background) => background.backgroundName
+        ),
+      });
     } catch (error: any) {
       console.error(error);
       res
@@ -183,8 +223,10 @@ async function authenticateToken(
   const accessToken = req.cookies.accessToken;
   const refreshToken = req.cookies.refreshToken;
 
-  if (!accessToken && !refreshToken)
+  if (!accessToken && !refreshToken) {
     res.status(401).json({ error: "No token provided." });
+    return;
+  }
 
   try {
     const atDecoded = jwt.verify(
@@ -199,14 +241,16 @@ async function authenticateToken(
 
       if (!user) {
         res.status(403).json({ error: "User not found." });
+        return;
       }
 
       if (user && user.remainingLoginAttempts <= 0) {
         res.status(403).json({ error: "User is blocked." });
+        return;
       }
 
       res.locals.userId = atDecoded.userId;
-      next();
+      return next();
     } else {
       // Access token not valid
       res.status(403).json({ error: "Invalid access token." });
@@ -215,6 +259,7 @@ async function authenticateToken(
     // If access token is expired or invalid, attempt to use refresh token
     if (!refreshToken) {
       res.status(401).json({ error: "No refresh token provided." });
+      return;
     }
 
     try {
@@ -247,7 +292,7 @@ async function authenticateToken(
         });
 
         res.locals.userId = rtDecoded.userId;
-        next();
+        return next();
       }
     } catch (refreshErr) {
       // Refresh token is invalid or expired
