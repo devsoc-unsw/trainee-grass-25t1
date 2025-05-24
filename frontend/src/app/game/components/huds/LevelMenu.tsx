@@ -10,6 +10,7 @@ import { Progress } from "@/components/ui/progress";
 import { LEVEL_THRESHOLD_ARRAY } from "@/constants/levels";
 import { useEffect, useState } from "react";
 import LoadingCircle from "../LoadingCircle";
+import { request } from "@/lib/utils";
 
 function LevelMenu({ user }: { user: any }) {
   const [userData, setUserData] = useState(user);
@@ -59,44 +60,27 @@ function LevelMenu({ user }: { user: any }) {
   const syncProgress = async (userId: string, leetcodeHandle: string) => {
     setIsLoading(true);
 
-    try {
-      const response = await fetch(
-        process.env.NEXT_PUBLIC_BASE_URL + "/sync-progress",
-        {
-          method: "POST",
-          credentials: "include",
-          headers: {
-            "Content-Type": "application/json",
-          },
-          body: JSON.stringify({ userId, leetcodeHandle }),
-        }
-      );
+    const { data, error } = await request("POST", "/sync-progress", {
+      userId,
+      leetcodeHandle,
+    });
 
-      const data = await response.json();
-
-      if (!response.ok) {
-        setResultMessage(data.message || "Failed to sync progress.");
-      } else if (data.message === "No new problems solved.") {
-        setResultMessage(data.message);
-      } else if (data.message === "User progress synced!") {
-        setResultMessage(
-          `Progress synced! New XP: ${data.newXP}, Level: ${data.newLevel}`
-        );
-        setUserData((prev: any) => ({
-          ...prev,
-          xp: data.newXP,
-          levels: data.newLevel,
-        }));
-      }
-
-      setResultDialogOpen(true);
-    } catch (error) {
-      console.error("Error syncing progress: ", error);
+    if (error) {
       setResultMessage("An error occurred while syncing progress.");
-      setResultDialogOpen(true);
-    } finally {
-      setIsLoading(false);
+    } else if (data.message === "No new problems solved.") {
+      setResultMessage(data.message);
+    } else if (data.message === "User progress synced!") {
+      setResultMessage(
+        `Progress synced! New XP: ${data.newXP}, Level: ${data.newLevel}`
+      );
+      setUserData((prev: any) => ({
+        ...prev,
+        xp: data.newXP,
+        levels: data.newLevel,
+      }));
     }
+    setResultDialogOpen(true);
+    setIsLoading(false);
   };
 
   if (!isDataLoaded) {
