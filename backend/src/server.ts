@@ -15,7 +15,6 @@ import { deleteToken, generateToken } from "./helper/tokenHelper";
 // Route imports
 import { authRegister } from "./auth/register";
 import { authLogout } from "./auth/logout";
-import { upsertDefaults } from "./helper/authHelper";
 import { syncUserProgress } from "./levels/syncUserProgress";
 import { getLeaderboard } from "./leaderboard/getLeaderboard";
 import { upsertSprites } from "./helper/spriteHelper";
@@ -167,18 +166,10 @@ app.post(
   "/sync-progress",
   authenticateToken,
   async (req: Request, res: Response) => {
-    const { userId, leetcodeHandle, leetcodeSessionCookie } = req.body;
-
-    if (!leetcodeSessionCookie) {
-      res.status(400).json({ error: "LeetCode session cookie required." });
-    }
+    const { userId, leetcodeHandle } = req.body;
 
     try {
-      const result = await syncUserProgress(
-        userId,
-        leetcodeHandle,
-        leetcodeSessionCookie
-      );
+      const result = await syncUserProgress(userId, leetcodeHandle);
       res.status(200).json(result);
     } catch (error: any) {
       console.error("Sync failed:", error);
@@ -326,6 +317,7 @@ async function authenticateToken(
       res
         .status(403)
         .json({ error: "Invalid refresh token. Please log in again." });
+      return;
     }
 
     // For any other errors

@@ -104,7 +104,7 @@ export default function Game() {
               (user?.backgroundUnlocked as BackgroundName[]) || []
             }
           />
-          <LevelMenu />
+          <LevelMenu user={user} />
         </div>
         {/* TODO: Right section of Navbar */}
         <div className="flex gap-2 items-center">

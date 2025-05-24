@@ -1,27 +1,17 @@
 import { PrismaClient } from "@prisma/client";
 import axios from "axios";
+import { calculateXP, getLevelFromXP } from "../helper/levelHelper";
 
 const prisma = new PrismaClient();
 
 const LEETCODE_API_ENDPOINT = "https://leetcode.com/graphql";
-
-const levelsMap: { [key: number]: number } = {
-  1: 0,
-  2: 10,
-  3: 30,
-  4: 55,
-  5: 80,
-};
 
 /**
  * Function to fetch leetcode stats
  * @param handle
  * @returns
  */
-async function fetchLeetcodeStats(
-  handle: string,
-  leetcodeSessionCookie: string
-) {
+async function fetchLeetcodeStats(handle: string) {
   const query = `
     query userPublicProfile($username: String!) {
       matchedUser(username: $username) {
@@ -50,7 +40,6 @@ async function fetchLeetcodeStats(
     {
       headers: {
         "Content-Type": "application/json",
-        Cookie: `LEETCODE_SESSION=${leetcodeSessionCookie}`,
       },
       withCredentials: true,
     }
@@ -72,8 +61,6 @@ async function fetchLeetcodeStats(
     hardSolved: findCount("Hard"),
   };
 
-  console.log(stats);
-
   return stats;
 }
 
@@ -85,12 +72,8 @@ async function fetchLeetcodeStats(
  * @param leetcodeSessionCookie
  * @returns
  */
-export async function syncUserProgress(
-  userId: string,
-  leetcodeHandle: string,
-  leetcodeSessionCookie: string
-) {
-  const stats = await fetchLeetcodeStats(leetcodeHandle, leetcodeSessionCookie);
+export async function syncUserProgress(userId: string, leetcodeHandle: string) {
+  const stats = await fetchLeetcodeStats(leetcodeHandle);
 
   const user = await prisma.user.findUnique({ where: { id: userId } });
   if (!user) {
@@ -102,19 +85,13 @@ export async function syncUserProgress(
     return { message: "No new problems solved." };
   }
 
-  const xpGained =
-    (stats?.easySolved - user.easySolved) * 5 +
-    (stats?.mediumSolved - user.mediumSolved) * 10 +
-    (stats?.hardSolved - user.hardSolved) * 20;
+  const newXP = calculateXP(
+    stats?.easySolved,
+    stats?.mediumSolved,
+    stats?.hardSolved
+  );
 
-  const newXP = user.xp + xpGained;
-
-  let newLevel = user.levels;
-  for (let lvl = user.levels + 1; levelsMap[lvl]; lvl++) {
-    if (newXP >= levelsMap[lvl]) {
-      newLevel = lvl;
-    }
-  }
+  const newLevel = getLevelFromXP(newXP);
 
   await prisma.user.update({
     where: { id: userId },
