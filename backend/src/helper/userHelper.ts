@@ -107,3 +107,34 @@ export async function createNewUser({
     ),
   };
 }
+
+export async function updateUserAvatar(userId: string, avatarName: string) {
+  // Update user's active avatar
+  const updatedUser = await prisma.user.update({
+    where: {
+      id: userId,
+    },
+    data: {
+      activeAvatarName: avatarName,
+    },
+  });
+
+  return updatedUser;
+}
+
+export async function updateUserBackground(
+  userId: string,
+  backgroundName: string
+) {
+  // Update user's active background
+  const updatedUser = await prisma.user.update({
+    where: {
+      id: userId,
+    },
+    data: {
+      activeBackgroundName: backgroundName,
+    },
+  });
+
+  return updatedUser;
+}
