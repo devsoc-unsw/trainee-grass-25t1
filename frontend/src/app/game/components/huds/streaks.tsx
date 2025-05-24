@@ -52,9 +52,9 @@ export default function SimpleBox() {
             <span className="absolute text-2xl left-20 top-25">Streak Count:</span>
             <span className="absolute text-2xl left-130 top-25">{streak}</span>
             <span className="absolute text-2xl left-20 top-55">days Skipped:</span>
-            <span className="absolute text-2xl left-130 top-55">{streak}</span>
+            <span className="absolute text-2xl left-115 top-55">Coming Soon</span>
             <span className="absolute text-2xl left-20 top-85">currentDayCompleted:</span>
-            <span className="absolute text-2xl left-130 top-85">{streak}</span>
+            <span className="absolute text-2xl left-115 top-85">Coming Soon</span>
           </div>
         </div>
         <DialogClose
