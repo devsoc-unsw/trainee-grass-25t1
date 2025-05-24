@@ -1,10 +1,11 @@
 "use client";
 
+import { BackgroundName, SpriteName } from "@/app/game/gameAssets";
 import useRequest from "@/hooks/useRequest";
 import { request } from "@/lib/utils";
 import { createContext, ReactNode, useEffect, useState } from "react";
 
-type User = {
+export type User = {
   id: string;
   name: string;
   username: string;
@@ -16,10 +17,10 @@ type User = {
   streaks: number;
   levels: number;
   xp: number;
-  activeAvatar: string;
-  activeBackground: string;
-  avatarUnlocked: string[];
-  backgroundUnlocked: string[];
+  activeAvatar: SpriteName;
+  activeBackground: BackgroundName;
+  avatarUnlocked: SpriteName[];
+  backgroundUnlocked: BackgroundName[];
 };
 
 type AuthContextType = {
