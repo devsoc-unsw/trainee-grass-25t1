@@ -162,15 +162,19 @@ app.post(
   }
 );
 
-app.get("/streak", async(req: Request, res: Response) => {
+app.get("/streak", 
+      authenticateToken, 
+      async(req: Request, res: Response) => {
 
   try { 
     // get the streak
+
     const userId = res.locals.userId;
     const streak = await getStreakCounter(userId);
+
     res.json(streak);
   } catch (error: any) {
-    // Handgle Error
+
     res.json("Error");
   }
 })
@@ -202,7 +206,6 @@ app.get(
   ) => {
     try {
       const userId = res.locals.userId;
-
       // Parse query parameters
       const page = req.query.page
         ? Math.max(1, parseInt(req.query.page, 10))

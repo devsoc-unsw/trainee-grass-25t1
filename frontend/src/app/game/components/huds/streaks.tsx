@@ -8,23 +8,19 @@ import {
   DialogClose
 } from "@radix-ui/react-dialog";
 import React, {useEffect, useState} from "react";
-
+import { request } from "@/lib/utils";
 
 export default function SimpleBox() {
 
-  const [streak, setStreak] = useState({
-    streakCount: 0,  
-    daysSkipped: 0,
-    currentDayCompleted: 0,
-  })
+  const [streak, setStreak] = useState(0)
 
-  const fetchStreak = () => {
-    fetch("/streak")
-      .then(res => res.json())
-      .then(data => {
-        if (!data.error) setStreak(data);
-      })
-      .catch(() => console.log("error"));
+  const fetchStreak = async () => {
+    const { data, error } = await request("GET", "/streak");
+    if (!error) {
+    setStreak(data);
+  } else {
+    console.error("Failed to fetch streak:", error);
+  }
   };
 
   useEffect(() => {
@@ -40,7 +36,7 @@ export default function SimpleBox() {
                   <BullseyeArrow className="w-10 h-10 top-2 left-5 text-black" />
                   <span>Streaks </span>
                 </div>
-                <span>{streak.streakCount} days </span>
+                <span>{streak} days </span>
             </div>
           </GameButton>
       </DialogTrigger>
@@ -54,11 +50,11 @@ export default function SimpleBox() {
         <div className="flex justify-center gap-4">
           <div className="grid grid-cols-2 h-96 overflow-y-auto">
             <span className="absolute text-2xl left-5 top-25">Streak Count:</span>
-            <span className="absolute text-2xl left-90 top-25">{streak.streakCount}</span>
+            <span className="absolute text-2xl left-90 top-25">{streak}</span>
             <span className="absolute text-2xl left-5 top-55">days Skipped:</span>
-            <span className="absolute text-2xl left-90 top-55">{streak.daysSkipped}</span>
+            <span className="absolute text-2xl left-90 top-55">{streak}</span>
             <span className="absolute text-2xl left-5 top-85">currentDayCompleted:</span>
-            <span className="absolute text-2xl left-90 top-85">{streak.currentDayCompleted}</span>
+            <span className="absolute text-2xl left-90 top-85">{streak}</span>
           </div>
         </div>
         <DialogClose
