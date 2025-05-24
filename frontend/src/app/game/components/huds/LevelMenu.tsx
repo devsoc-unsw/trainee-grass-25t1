@@ -9,7 +9,7 @@ import GameButton from "@/app/game/components/GameButton";
 import { Progress } from "@/components/ui/progress";
 import { LEVEL_THRESHOLD_ARRAY } from "@/constants/levels";
 import { useEffect, useState } from "react";
-import LoadingCircle from "../LoadingCircle";
+import LoadingCircle from "../../../../components/icons/LoadingCircle";
 import { request } from "@/lib/utils";
 
 function LevelMenu({ user }: { user: any }) {
