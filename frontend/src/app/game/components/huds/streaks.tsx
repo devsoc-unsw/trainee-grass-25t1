@@ -6,7 +6,7 @@ import {
   DialogTrigger,
   DialogTitle,
   DialogClose
-} from "@radix-ui/react-dialog";
+} from "@/components/ui/Dialog";
 import React, {useEffect, useState} from "react";
 import { request } from "@/lib/utils";
 
@@ -30,7 +30,7 @@ export default function SimpleBox() {
   return (
     <Dialog>
       <DialogTrigger asChild>
-          <GameButton>
+          <GameButton tooltipText="Streak">
             <div className="flex items-center w-60 justify-between" >
                 <div className="flex items-center">
                   <BullseyeArrow className="w-10 h-10 top-2 left-5 text-black" />
@@ -49,12 +49,12 @@ export default function SimpleBox() {
         </DialogTitle>
         <div className="flex justify-center gap-4">
           <div className="grid grid-cols-2 h-96 overflow-y-auto">
-            <span className="absolute text-2xl left-5 top-25">Streak Count:</span>
-            <span className="absolute text-2xl left-90 top-25">{streak}</span>
-            <span className="absolute text-2xl left-5 top-55">days Skipped:</span>
-            <span className="absolute text-2xl left-90 top-55">{streak}</span>
-            <span className="absolute text-2xl left-5 top-85">currentDayCompleted:</span>
-            <span className="absolute text-2xl left-90 top-85">{streak}</span>
+            <span className="absolute text-2xl left-20 top-25">Streak Count:</span>
+            <span className="absolute text-2xl left-130 top-25">{streak}</span>
+            <span className="absolute text-2xl left-20 top-55">days Skipped:</span>
+            <span className="absolute text-2xl left-130 top-55">{streak}</span>
+            <span className="absolute text-2xl left-20 top-85">currentDayCompleted:</span>
+            <span className="absolute text-2xl left-130 top-85">{streak}</span>
           </div>
         </div>
         <DialogClose
