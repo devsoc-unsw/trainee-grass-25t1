@@ -53,12 +53,12 @@ export default function SimpleBox() {
         </DialogTitle>
         <div className="flex justify-center gap-4">
           <div className="grid grid-cols-2 h-96 overflow-y-auto">
-            <span className=" text-2xl left-5 top-25">Streak Count:</span>
-            <span className=" text-2xl left-90 top-25">{streak.streakCount}</span>
-            <span className=" text-2xl left-5 top-55">days Skipped:</span>
-            <span className=" text-2xl left-90 top-55">{streak.daysSkipped}</span>
-            <span className=" text-2xl left-5 top-85">currentDayCompleted:</span>
-            <span className=" text-2xl left-90 top-85">{streak.currentDayCompleted}</span>
+            <span className="absolute text-2xl left-5 top-25">Streak Count:</span>
+            <span className="absolute text-2xl left-90 top-25">{streak.streakCount}</span>
+            <span className="absolute text-2xl left-5 top-55">days Skipped:</span>
+            <span className="absolute text-2xl left-90 top-55">{streak.daysSkipped}</span>
+            <span className="absolute text-2xl left-5 top-85">currentDayCompleted:</span>
+            <span className="absolute text-2xl left-90 top-85">{streak.currentDayCompleted}</span>
           </div>
         </div>
         <DialogClose

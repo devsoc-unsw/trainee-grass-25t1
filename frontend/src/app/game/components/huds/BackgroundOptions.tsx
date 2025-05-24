@@ -22,9 +22,11 @@ import SpritePreviewOption from "../SpritePreviewOption";
 export default function AvatarOptions({
   background,
   setBackground,
+  backgroundsUnlocked,
 }: {
   background: BackgroundName;
   setBackground: (b: BackgroundName) => void;
+  backgroundsUnlocked: BackgroundName[];
 }) {
   const [selectedBackground, setSelectedBackground] = useState<Background>(
     BACKGROUNDS_MAP.get(background)!
@@ -65,6 +67,7 @@ export default function AvatarOptions({
                 height={54}
                 selectedSprite={selectedBackground}
                 setSelectedSprite={setSelectedBackground}
+                unlocked={backgroundsUnlocked.includes(background.name)}
               />
             ))}
           </div>

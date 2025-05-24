@@ -7,6 +7,10 @@ import { BackgroundName, SpriteName } from "./gameAssets";
 import BackgroundOptions from "./components/huds/BackgroundOptions";
 import SimpleBox from "./components/huds/streaks";
 
+import LevelMenu from "./components/huds/LevelMenu";
+import LeaderboardDialog from "./components/huds/leaderboard/LeaderboardDialog";
+import useAuth from "@/hooks/useAuth";
+
 export default function Game() {
   // States
   const [gameController] = useState<GameController>(() => new GameController());
@@ -15,6 +19,9 @@ export default function Game() {
 
   // Refs
   const canvasRef = useRef<HTMLCanvasElement>(null);
+
+  // User data
+  const { user } = useAuth();
 
   useEffect(() => {
     if (canvasRef.current) {
@@ -73,22 +80,39 @@ export default function Game() {
     gameController.changePlayer(avatar);
   }, [gameController, avatar]);
 
-  return (
-    <div className="overflow-hidden relative flex items-center justify-center">
+  useEffect(() => {
+    if (user?.activeAvatar) {
+      setAvatar(user.activeAvatar as SpriteName);
+    }
+    if (user?.activeBackground) {
+      setBackground(user.activeBackground as BackgroundName);
+    }
+  }, [user]);
 
-      <nav className="absolute top-0 flex justify-between p-4">
+  return (
+    <div className="bg-foreground overflow-hidden relative flex items-center justify-center">
+      <nav className="absolute top-0 flex justify-between p-4 w-full">
         {/* TODO: Left section of Navbar */}
         <div className="flex gap-2 items-center">
-          <AvatarOptions avatar={avatar} setAvatar={setAvatar} />
+          <AvatarOptions
+            avatar={avatar}
+            setAvatar={setAvatar}
+            avatarsUnlocked={(user?.avatarUnlocked as SpriteName[]) || []}
+          />
           <BackgroundOptions
             background={background}
             setBackground={setBackground}
+            backgroundsUnlocked={
+              (user?.backgroundUnlocked as BackgroundName[]) || []
+            }
           />
+          <LevelMenu user={user} />
           <SimpleBox />
         </div>
         {/* TODO: Right section of Navbar */}
-
-        <div className="flex gap-2 items-center"></div>
+        <div className="flex gap-2 items-center">
+          <LeaderboardDialog />
+        </div>
       </nav>
       <canvas ref={canvasRef} id="game" />
   

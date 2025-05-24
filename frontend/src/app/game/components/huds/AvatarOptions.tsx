@@ -22,9 +22,11 @@ import SpritePreviewOption from "../SpritePreviewOption";
 export default function AvatarOptions({
   avatar,
   setAvatar,
+  avatarsUnlocked,
 }: {
   avatar: SpriteName;
   setAvatar: (s: SpriteName) => void;
+  avatarsUnlocked: SpriteName[];
 }) {
   const [selectedAvatar, setSelectedAvatar] = useState<Sprite>(
     SPRITES_MAP.get(avatar)!
@@ -65,6 +67,7 @@ export default function AvatarOptions({
                 height={128}
                 selectedSprite={selectedAvatar}
                 setSelectedSprite={setSelectedAvatar}
+                unlocked={avatarsUnlocked.includes(sprite.name)}
               />
             ))}
           </div>
