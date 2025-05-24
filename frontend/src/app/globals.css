@@ -24,3 +24,11 @@ body {
   color: var(--foreground);
   font-family: var(--font-pixelify-sans), Arial, Helvetica, sans-serif;
 }
+
+.pixel-art {
+  image-rendering: pixelated;
+  image-rendering: -moz-crisp-edges;
+  image-rendering: crisp-edges;
+  image-rendering: -webkit-crisp-edges;
+  -ms-interpolation-mode: nearest-neighbor;
+}
