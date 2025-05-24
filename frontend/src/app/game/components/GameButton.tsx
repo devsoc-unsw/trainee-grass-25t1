@@ -26,7 +26,7 @@ const GameButton = forwardRef<ComponentRef<"button">, NavbarButtonProps>(
             </button>
           </TooltipTrigger>
           <TooltipContent side="bottom" sideOffset={8}>
-            <p className="bg-background py-1 px-2 rounded-sm max-w-[96px] text-ellipsis relative after:w-4 after:h-4 after:absolute after:bg-background after:-top-1 after:left-1/2 after:-translate-x-1/2 after:rotate-45 after:-z-10">
+            <p className="bg-background py-1 px-2 rounded-sm max-w-[96px] w-full truncate relative after:w-4 after:h-4 after:absolute after:bg-background after:-top-1 after:left-1/2 after:-translate-x-1/2 after:rotate-45 after:-z-10">
               {tooltipText}
             </p>
           </TooltipContent>

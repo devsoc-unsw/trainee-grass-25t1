@@ -1,10 +1,10 @@
 import axios from "axios";
 
 import { PrismaClient } from "@prisma/client";
-import { getUserById } from "./userHelper";
+
 const prisma = new PrismaClient();
 
-// Other constants
+// Constants
 const LEETCODE_API_ENDPOINT = "https://leetcode.com/graphql";
 
 export async function checkUsernameExists(username: string): Promise<boolean> {
@@ -36,23 +36,11 @@ export async function checkBlockedAccount(username: string): Promise<boolean> {
 }
 
 ///////////////////////// LeetCode handling /////////////////////////
-
 export async function getUserAndStoreStats(
   leetcodeSessionCookie: string
 ): Promise<any | null> {
-  //TODO: Remove after testing stages
-  if (leetcodeSessionCookie === "MOCK_COOKIE") {
-    // Simulate a successful response
-    return {
-      username: "mockUser",
-      profile: {
-        realName: "Mock Real Name",
-        userAvatar: "https://example.com/mock-avatar.png",
-        school: "Mock University",
-      },
-    };
-  }
   try {
+    // Validate leetcodeSessionCookie
     const mRes = await axios.get(
       "https://leetcode.com/api/problems/algorithms/",
       {
@@ -61,8 +49,11 @@ export async function getUserAndStoreStats(
         },
       }
     );
+
     const username = mRes.data.user_name;
     if (!username) return null;
+
+    // Get user data from LeetCode
     const combinedQuery = `
     query combinedUserProfile($username: String!) {
       matchedUser(username: $username) {
@@ -99,6 +90,7 @@ export async function getUserAndStoreStats(
       }
     );
 
+    // Return early if no user data is found from the leetcode API
     const data = response.data.data?.matchedUser;
     if (!data) {
       return null;
@@ -118,108 +110,12 @@ export async function getUserAndStoreStats(
 
     return {
       username: data.username,
-      profile: {
-        realName: userProfile?.realName?.trim() || data.username,
-        userAvatar: userProfile?.userAvatar,
-        school: userProfile?.school,
-        ranking: userProfile?.ranking ?? 0,
-      },
-      stats,
+      realName: userProfile?.realName?.trim() || data.username,
+      userAvatar: userProfile?.userAvatar,
+      ...stats,
     };
   } catch (error) {
     console.error("Error fetching user in leetcode", error);
     return null;
-  }
-}
-
-///////////////////////// XP and level handling /////////////////////////
-export function calculateXP(
-  easySolved: number,
-  mediumSolved: number,
-  hardSolved: number
-): number {
-  const easyXP = 5;
-  const mediumXP = 10;
-  const hardXP = 20;
-
-  const xp =
-    (easySolved || 0) * easyXP +
-    (mediumSolved || 0) * mediumXP +
-    (hardSolved || 0) * hardXP;
-
-  return xp;
-}
-
-export async function updateUserXPAndLevel(userId: string) {
-  const user = await getUserById(userId);
-
-  if (!user) return 0;
-
-  const xp = calculateXP(user.easySolved, user.mediumSolved, user.hardSolved);
-  const level = getLevelFromXP(xp);
-
-  await prisma.user.update({
-    where: { id: userId },
-    data: {
-      xp,
-      levels: level,
-    },
-  });
-}
-
-// TODO: Level handling
-const levelThresholds = [
-  { level: 1, xp: 0 },
-  { level: 2, xp: 10 },
-  { level: 3, xp: 30 },
-  { level: 4, xp: 55 },
-  { level: 5, xp: 80 },
-];
-
-export function getLevelFromXP(xp: number): number {
-  let level = 1;
-  for (const threshold of levelThresholds) {
-    if (xp >= threshold.xp) {
-      level = threshold.level;
-    } else {
-      break;
-    }
-  }
-  return level;
-}
-
-// TODO: UPSERT ALL AVATARS AND BACKGROUNDS
-export async function upsertDefaults() {
-  const avatars = [
-    {
-      name: "default",
-      imageUrl: "/sprites/default.png",
-      unlockRequirement: 0,
-    },
-  ];
-
-  for (const avatar of avatars) {
-    await prisma.avatar.upsert({
-      where: { name: avatar.name },
-      update: {},
-      create: avatar,
-    });
-  }
-
-  // Default Backgrounds
-  const backgrounds = [
-    {
-      name: "mountain",
-      imageUrl: "/backgrounds/mountain.png",
-      unlockRequirement: 0,
-    },
-  ];
-
-  for (const background of backgrounds) {
-    await prisma.background.upsert({
-      where: { name: background.name },
-      update: {},
-      create: background,
-    });
   }
 }

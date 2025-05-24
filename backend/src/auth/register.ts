@@ -1,14 +1,31 @@
-import {
-  getUserAndStoreStats,
-  updateUserXPAndLevel,
-} from "../helper/authHelper";
+import { getUserAndStoreStats } from "../helper/authHelper";
+import { updateUserXPAndLevel } from "../helper/levelHelper";
+import { unlockAvatars, unlockBackgrounds } from "../helper/spriteHelper";
 import { generateToken } from "../helper/tokenHelper";
 
 import { PrismaClient } from "@prisma/client";
+import { createNewUser } from "../helper/userHelper";
 const prisma = new PrismaClient();
 
+export type UserResponse = {
+  id: string;
+  name: string;
+  username: string;
+  totalSolved: number;
+  easySolved: number;
+  mediumSolved: number;
+  hardSolved: number;
+  streaks: number;
+  levels: number;
+  xp: number;
+  activeAvatar: string;
+  activeBackground: string;
+  leetcodeHandle: string;
+  avatarUnlocked: string[];
+  backgroundUnlocked: string[];
+};
+
 export async function authRegister(leetcodeSessionCookie: string) {
-  // Error Handling
   const userData = await getUserAndStoreStats(leetcodeSessionCookie);
 
   if (!userData) {
@@ -19,13 +36,26 @@ export async function authRegister(leetcodeSessionCookie: string) {
   }
 
   const username = userData.username;
-  const name = userData.profile?.realName?.trim() || username;
 
+  // Check if the user is trying to sign in is an existing user
   const existingUser = await prisma.user.findFirst({
     where: { username },
+    include: {
+      avatarUnlocked: {
+        select: {
+          avatarName: true,
+        },
+      },
+      backgroundUnlocked: {
+        select: {
+          backgroundName: true,
+        },
+      },
+    },
   });
+
   if (existingUser) {
-    const token = generateToken(existingUser.id);
+    const token = await generateToken(existingUser.id);
     await updateUserXPAndLevel(existingUser.id);
     return {
       token,
@@ -33,49 +63,52 @@ export async function authRegister(leetcodeSessionCookie: string) {
         id: existingUser.id,
         name: existingUser.name,
         username: existingUser.username,
-        activeAvatar: existingUser.activeAvatarId,
-        activeBackground: existingUser.activeBackgroundId,
+        totalSolved: existingUser.totalSolved,
+        easySolved: existingUser.easySolved,
+        mediumSolved: existingUser.mediumSolved,
+        hardSolved: existingUser.hardSolved,
+        streaks: existingUser.streaks,
+        levels: existingUser.levels,
+        xp: existingUser.xp,
+        activeAvatar: existingUser.activeAvatarName,
+        activeBackground: existingUser.activeBackgroundName,
         leetcodeHandle: existingUser.leetcodeHandle,
+        avatarUnlocked: existingUser.avatarUnlocked.map(
+          (avatar) => avatar.avatarName
+        ),
+        backgroundUnlocked: existingUser.backgroundUnlocked.map(
+          (background) => background.backgroundName
+        ),
       },
     };
   }
 
-  const defaultAvatar = await prisma.avatar.findUnique({
-    where: { name: "default" },
+  // Get default avatar and background
+  const defaultAvatar = await prisma.avatar.findFirst({
+    where: {
+      name: "default",
+    },
   });
-
-  const defaultBackground = await prisma.background.findUnique({
-    where: { name: "mountain" },
-  });
-
-  if (!defaultAvatar || !defaultBackground) {
-    throw new Error("Default avatar or background not found");
-  }
-
-  const user = await prisma.user.create({
-    data: {
-      name,
-      username,
-      leetcodeHandle: username,
-      activeAvatarId: defaultAvatar.id,
-      activeBackgroundId: defaultBackground.id,
+  const defaultBackground = await prisma.background.findFirst({
+    where: {
+      name: "mountain",
     },
   });
 
-  // XP and levels handling
-  await updateUserXPAndLevel(user.id);
-
-  const token = generateToken(user.id);
+  const name = userData.profile?.realName?.trim() || username;
+  const newUser = await createNewUser({
+    name,
+    username,
+    leetcodeHandle: username,
+    totalSolved: userData.totalSolved,
+    easySolved: userData.easySolved,
+    mediumSolved: userData.mediumSolved,
+    hardSolved: userData.hardSolved,
+  });
+  const token = await generateToken(newUser.id);
 
   return {
     token,
-    user: {
-      id: user.id,
-      name: user.name,
-      username: user.username,
-      activeAvatar: user.activeAvatarId,
-      activeBackground: user.activeBackgroundId,
-      leetcodeHandle: user.leetcodeHandle,
-    },
+    user: newUser,
   };
 }
