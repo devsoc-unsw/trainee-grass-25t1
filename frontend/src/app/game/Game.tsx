@@ -8,6 +8,7 @@ import BackgroundOptions from "./components/huds/BackgroundOptions";
 import LevelMenu from "./components/huds/LevelMenu";
 import LeaderboardDialog from "./components/huds/leaderboard/LeaderboardDialog";
 import useAuth from "@/hooks/useAuth";
+import UserProfile from "./components/huds/UserProfile";
 
 export default function Game() {
   // States
@@ -109,6 +110,7 @@ export default function Game() {
         {/* TODO: Right section of Navbar */}
         <div className="flex gap-2 items-center">
           <LeaderboardDialog />
+          <UserProfile userName={user?.username} />
         </div>
       </nav>
       <canvas ref={canvasRef} id="game" />
