@@ -81,6 +81,7 @@ app.post("/auth/signin", async (req: Request, res: Response): Promise<any> => {
       path: "/",
       secure: isProduction,
       domain: COOKIES_DOMAIN,
+      sameSite: isProduction ? "none" : "lax",
       maxAge: 1800000,
     });
     res.cookie("refreshToken", (await token).refreshToken, {
@@ -88,6 +89,7 @@ app.post("/auth/signin", async (req: Request, res: Response): Promise<any> => {
       path: "/",
       secure: isProduction,
       domain: COOKIES_DOMAIN,
+      sameSite: isProduction ? "none" : "lax",
       maxAge: 7776000000,
     });
 
@@ -382,6 +384,7 @@ async function authenticateToken(
           path: "/",
           secure: isProduction,
           domain: COOKIES_DOMAIN,
+          sameSite: isProduction ? "none" : "lax",
           maxAge: 1800000,
         });
         res.cookie("refreshToken", newTokens.refreshToken, {
@@ -389,6 +392,7 @@ async function authenticateToken(
           path: "/",
           secure: isProduction,
           domain: COOKIES_DOMAIN,
+          sameSite: isProduction ? "none" : "lax",
           maxAge: 7776000000,
         });
 
