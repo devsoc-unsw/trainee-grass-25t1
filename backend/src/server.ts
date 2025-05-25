@@ -38,11 +38,7 @@ const httpServer = new Server(app);
 // Use middleware that allows for access from other domains
 app.use(
   cors({
-    origin: [
-      "http://localhost:8080",
-      "https://trainee-grass-25t1.vercel.app",
-      "https://trainee-grass-25t1-4xhleekge-merryrosalies-projects.vercel.app",
-    ],
+    origin: ["http://localhost:8080", "https://leetcraft.dev"],
     credentials: true,
   })
 );
@@ -50,7 +46,7 @@ app.use(
 // Constants
 const PORT: number = parseInt(process.env.PORT || "3000");
 const isProduction = process.env.NODE_ENV === "production";
-const COOKIES_DOMAIN = isProduction ? undefined : ".localhost";
+const COOKIES_DOMAIN = isProduction ? ".leetcraft.dev" : ".localhost";
 const DEFAULT_PAGE_NUMBER = 1;
 const DEFAULT_PAGE_SIZE = 5;
 
