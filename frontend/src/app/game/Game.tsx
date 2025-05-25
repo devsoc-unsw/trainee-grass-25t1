@@ -10,6 +10,8 @@ import LeaderboardDialog from "./components/huds/leaderboard/LeaderboardDialog";
 import useAuth from "@/hooks/useAuth";
 import UserProfile from "./components/huds/UserProfile";
 import SimpleBox from "./components/huds/streaks";
+import About from "./components/huds/About";
+import Music from "./components/huds/Music";
 
 export default function Game() {
   // States
@@ -91,10 +93,9 @@ export default function Game() {
 
   return (
     <div className="bg-foreground overflow-hidden relative flex items-center justify-center">
-      <nav className="absolute top-0 flex justify-between p-4 w-full">
+      <nav className="absolute top-0 flex justify-center lg:justify-between p-4 w-full gap-2 flex-wrap">
         {/* TODO: Left section of Navbar */}
-        <div className="flex gap-2 items-center">
-          
+        <div className="flex gap-2 items-center justify-center lg:justify-start flex-wrap">
           <AvatarOptions
             avatar={avatar}
             setAvatar={setAvatar}
@@ -111,7 +112,9 @@ export default function Game() {
           <LevelMenu user={user} />
         </div>
         {/* TODO: Right section of Navbar */}
-        <div className="flex gap-2 items-center">
+        <div className="flex gap-2 items-center justify-center lg:justify-start flex-wrap">
+          <Music />
+          <About />
           <LeaderboardDialog />
           <UserProfile userName={user?.username} />
         </div>

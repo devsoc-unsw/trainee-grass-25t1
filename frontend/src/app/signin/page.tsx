@@ -4,8 +4,7 @@ import LoadingCircle from "@/components/icons/LoadingCircle";
 import { request } from "@/lib/utils";
 import { useRouter } from "next/navigation";
 import { useMemo, useState } from "react";
-import SpritePreviewOption from "../game/components/SpritePreviewOption";
-import { SPRITES, SPRITES_MAP } from "../game/gameAssets";
+import { SPRITES_MAP } from "../game/gameAssets";
 import AnimatedSpritePreview from "../game/components/AnimatedSpritePreview";
 
 export default function SignUpPage() {

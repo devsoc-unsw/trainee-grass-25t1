@@ -1,4 +1,7 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
+
 "use client";
+
 import {
   Dialog,
   DialogTitle,
@@ -181,3 +184,5 @@ function LevelMenu({ user }: { user: any }) {
 }
 
 export default LevelMenu;
+
+/* eslint-enable @typescript-eslint/no-explicit-any */
