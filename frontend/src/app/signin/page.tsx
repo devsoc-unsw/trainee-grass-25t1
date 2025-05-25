@@ -39,7 +39,7 @@ export default function SignUpPage() {
   };
 
   return (
-    <div className="relative w-full h-screen overflow-hidden">
+    <div className="relative w-screen h-screen flex justify-center items-center overflow-hidden">
       {/* Background Image */}
       <div
         className="absolute top-0 left-0 w-full h-full"
@@ -51,19 +51,19 @@ export default function SignUpPage() {
         }}
       />
 
-      <div className="absolute top-46 left-1/2 -translate-x-1/2">
-        <AnimatedSpritePreview
-          sprite={SPRITES_MAP.get("default")!}
-          width={160}
-          height={140}
-          isStatic
-        />
-      </div>
+      <div className="relative w-full max-w-md">
+        <div className="absolute -top-[60%] left-1/2 -translate-x-1/2">
+          <AnimatedSpritePreview
+            sprite={SPRITES_MAP.get("default")!}
+            width={160}
+            height={140}
+            isStatic
+          />
+        </div>
 
-      {/* Centered signup form */}
-      <div className="absolute inset-0 z-20 flex items-center justify-center">
+        {/* Centered signup form */}
         <form
-          className="bg-white bg-opacity-80 backdrop-blur-md p-8 rounded-2xl shadow-lg w-full max-w-md"
+          className="bg-white bg-opacity-80 backdrop-blur-md p-8 rounded-2xl shadow-lg w-full"
           onSubmit={handleSignIn}
         >
           <p className="text-2xl font-bold mb-4 text-center">

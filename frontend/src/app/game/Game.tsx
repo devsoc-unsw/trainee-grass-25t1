@@ -12,18 +12,23 @@ import UserProfile from "./components/huds/UserProfile";
 import SimpleBox from "./components/huds/streaks";
 import About from "./components/huds/About";
 import Music from "./components/huds/Music";
+import { request } from "@/lib/utils";
 
 export default function Game() {
+  // User data
+  const { user, setUser } = useAuth();
+
   // States
   const [gameController] = useState<GameController>(() => new GameController());
-  const [avatar, setAvatar] = useState<SpriteName>("default");
-  const [background, setBackground] = useState<BackgroundName>("mountain");
+  const [avatar, setAvatar] = useState<SpriteName>(
+    user?.activeAvatar ?? "default"
+  );
+  const [background, setBackground] = useState<BackgroundName>(
+    user?.activeBackground ?? "mountain"
+  );
 
   // Refs
   const canvasRef = useRef<HTMLCanvasElement>(null);
-
-  // User data
-  const { user } = useAuth();
 
   useEffect(() => {
     if (canvasRef.current) {
@@ -76,10 +81,29 @@ export default function Game() {
 
   useEffect(() => {
     gameController.changeBackground(background);
+    if (user) {
+      setUser({ ...user, activeBackground: background });
+    }
+
+    const changeBackground = async (background: BackgroundName) => {
+      await request("POST", "/user/background", { background });
+    };
+    changeBackground(background);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [gameController, background]);
 
   useEffect(() => {
     gameController.changePlayer(avatar);
+
+    if (user) {
+      setUser({ ...user, activeAvatar: avatar });
+    }
+
+    const changeAvatar = async (avatar: SpriteName) => {
+      await request("POST", "/user/avatar", { avatar });
+    };
+    changeAvatar(avatar);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [gameController, avatar]);
 
   useEffect(() => {
@@ -99,14 +123,12 @@ export default function Game() {
           <AvatarOptions
             avatar={avatar}
             setAvatar={setAvatar}
-            avatarsUnlocked={(user?.avatarUnlocked as SpriteName[]) || []}
+            avatarsUnlocked={user?.avatarUnlocked || []}
           />
           <BackgroundOptions
             background={background}
             setBackground={setBackground}
-            backgroundsUnlocked={
-              (user?.backgroundUnlocked as BackgroundName[]) || []
-            }
+            backgroundsUnlocked={user?.backgroundUnlocked || []}
           />
           <SimpleBox />
           <LevelMenu user={user} />
