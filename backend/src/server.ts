@@ -38,15 +38,19 @@ const httpServer = new Server(app);
 // Use middleware that allows for access from other domains
 app.use(
   cors({
-    origin: ["http://localhost:8080"],
+    origin: [
+      "http://localhost:8080",
+      "https://leetcraft.dev",
+      "https://www.leetcraft.dev",
+    ],
     credentials: true,
   })
 );
 
 // Constants
 const PORT: number = parseInt(process.env.PORT || "3000");
-const isProduction: boolean = process.env.NODE_ENV === "production";
-const COOKIES_DOMAIN = isProduction ? "" : ".localhost"; // TODO: COOKIES DOMAIN FOR DEPLOYMENT
+const isProduction = process.env.NODE_ENV === "production";
+const COOKIES_DOMAIN = isProduction ? ".leetcraft.dev" : ".localhost";
 const DEFAULT_PAGE_NUMBER = 1;
 const DEFAULT_PAGE_SIZE = 5;
 
@@ -61,45 +65,44 @@ app.get("/", async (req: Request, res: Response) => {
 });
 
 // AUTH ROUTES
-app.post(
-  "/auth/signin",
-  async (req: Request, res: Response): Promise<any> => {
-    try {
-      const { leetcodeSessionCookie } = req.body;
-      if (!leetcodeSessionCookie) {
-        return res
-          .status(400)
-          .json({ error: "LeetCode session cookie required." });
-      }
-      const { token, user } = await signIn(leetcodeSessionCookie);
-
-      // Assign cookies
-      res.cookie("accessToken", (await token).accessToken, {
-        httpOnly: isProduction,
-        path: "/",
-        secure: isProduction,
-        domain: COOKIES_DOMAIN,
-        maxAge: 1800000,
-      });
-      res.cookie("refreshToken", (await token).refreshToken, {
-        httpOnly: isProduction,
-        path: "/",
-        secure: isProduction,
-        domain: COOKIES_DOMAIN,
-        maxAge: 7776000000,
-      });
-
-      res.header("Access-Control-Allow-Credentials", "true");
-
-      res.status(200).json(user);
-    } catch (error: any) {
-      console.error(error);
-      res
-        .status(error.status || 500)
-        .json({ error: error.message || "An error occurred." });
+app.post("/auth/signin", async (req: Request, res: Response): Promise<any> => {
+  try {
+    const { leetcodeSessionCookie } = req.body;
+    if (!leetcodeSessionCookie) {
+      return res
+        .status(400)
+        .json({ error: "LeetCode session cookie required." });
     }
+    const { token, user } = await signIn(leetcodeSessionCookie);
+
+    // Assign cookies
+    res.cookie("accessToken", (await token).accessToken, {
+      httpOnly: isProduction,
+      path: "/",
+      secure: isProduction,
+      domain: COOKIES_DOMAIN,
+      sameSite: isProduction ? "none" : "lax",
+      maxAge: 1800000,
+    });
+    res.cookie("refreshToken", (await token).refreshToken, {
+      httpOnly: isProduction,
+      path: "/",
+      secure: isProduction,
+      domain: COOKIES_DOMAIN,
+      sameSite: isProduction ? "none" : "lax",
+      maxAge: 7776000000,
+    });
+
+    res.header("Access-Control-Allow-Credentials", "true");
+
+    res.status(200).json(user);
+  } catch (error: any) {
+    console.error(error);
+    res
+      .status(error.status || 500)
+      .json({ error: error.message || "An error occurred." });
   }
-);
+});
 
 app.get(
   "/auth/me",
@@ -167,11 +170,8 @@ app.post(
   }
 );
 
-app.get("/streak", 
-      authenticateToken, 
-      async(req: Request, res: Response) => {
-
-  try { 
+app.get("/streak", authenticateToken, async (req: Request, res: Response) => {
+  try {
     // get the streak
 
     const userId = res.locals.userId;
@@ -179,10 +179,9 @@ app.get("/streak",
 
     res.json(streak);
   } catch (error: any) {
-
     res.json("Error");
   }
-})
+});
 
 // LEVELS ROUTE
 app.post(
@@ -385,6 +384,7 @@ async function authenticateToken(
           path: "/",
           secure: isProduction,
           domain: COOKIES_DOMAIN,
+          sameSite: isProduction ? "none" : "lax",
           maxAge: 1800000,
         });
         res.cookie("refreshToken", newTokens.refreshToken, {
@@ -392,6 +392,7 @@ async function authenticateToken(
           path: "/",
           secure: isProduction,
           domain: COOKIES_DOMAIN,
+          sameSite: isProduction ? "none" : "lax",
           maxAge: 7776000000,
         });
 
