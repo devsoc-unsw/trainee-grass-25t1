@@ -5,7 +5,7 @@ import VolumeX from "@/components/icons/VolumeX";
 
 export default function Music() {
   const audioRef = useRef<HTMLAudioElement | null>(null);
-  const [isPlaying, setIsPlaying] = useState(true);
+  const [isPlaying, setIsPlaying] = useState(false);
 
   const toggleMusic = () => {
     if (!audioRef.current) return;
@@ -19,6 +19,7 @@ export default function Music() {
 
     setIsPlaying((prev) => !prev);
   };
+
   return (
     <GameButton onClick={toggleMusic}>
       {isPlaying ? (
@@ -26,7 +27,7 @@ export default function Music() {
       ) : (
         <VolumeX width={32} height={32} />
       )}
-      <audio ref={audioRef} src="/bgm.mp3" autoPlay loop preload="auto" />
+      <audio ref={audioRef} src="/bgm.mp3" loop preload="auto" />
     </GameButton>
   );
 }
