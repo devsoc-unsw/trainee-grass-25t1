@@ -38,7 +38,11 @@ const httpServer = new Server(app);
 // Use middleware that allows for access from other domains
 app.use(
   cors({
-    origin: ["http://localhost:8080", "https://trainee-grass-25t1.vercel.app/"],
+    origin: [
+      "http://localhost:8080",
+      "https://trainee-grass-25t1.vercel.app",
+      "https://trainee-grass-25t1-4xhleekge-merryrosalies-projects.vercel.app",
+    ],
     credentials: true,
   })
 );
@@ -61,45 +65,42 @@ app.get("/", async (req: Request, res: Response) => {
 });
 
 // AUTH ROUTES
-app.post(
-  "/auth/signin",
-  async (req: Request, res: Response): Promise<any> => {
-    try {
-      const { leetcodeSessionCookie } = req.body;
-      if (!leetcodeSessionCookie) {
-        return res
-          .status(400)
-          .json({ error: "LeetCode session cookie required." });
-      }
-      const { token, user } = await signIn(leetcodeSessionCookie);
-
-      // Assign cookies
-      res.cookie("accessToken", (await token).accessToken, {
-        httpOnly: isProduction,
-        path: "/",
-        secure: isProduction,
-        domain: COOKIES_DOMAIN,
-        maxAge: 1800000,
-      });
-      res.cookie("refreshToken", (await token).refreshToken, {
-        httpOnly: isProduction,
-        path: "/",
-        secure: isProduction,
-        domain: COOKIES_DOMAIN,
-        maxAge: 7776000000,
-      });
-
-      res.header("Access-Control-Allow-Credentials", "true");
-
-      res.status(200).json(user);
-    } catch (error: any) {
-      console.error(error);
-      res
-        .status(error.status || 500)
-        .json({ error: error.message || "An error occurred." });
+app.post("/auth/signin", async (req: Request, res: Response): Promise<any> => {
+  try {
+    const { leetcodeSessionCookie } = req.body;
+    if (!leetcodeSessionCookie) {
+      return res
+        .status(400)
+        .json({ error: "LeetCode session cookie required." });
     }
+    const { token, user } = await signIn(leetcodeSessionCookie);
+
+    // Assign cookies
+    res.cookie("accessToken", (await token).accessToken, {
+      httpOnly: isProduction,
+      path: "/",
+      secure: isProduction,
+      domain: COOKIES_DOMAIN,
+      maxAge: 1800000,
+    });
+    res.cookie("refreshToken", (await token).refreshToken, {
+      httpOnly: isProduction,
+      path: "/",
+      secure: isProduction,
+      domain: COOKIES_DOMAIN,
+      maxAge: 7776000000,
+    });
+
+    res.header("Access-Control-Allow-Credentials", "true");
+
+    res.status(200).json(user);
+  } catch (error: any) {
+    console.error(error);
+    res
+      .status(error.status || 500)
+      .json({ error: error.message || "An error occurred." });
   }
-);
+});
 
 app.get(
   "/auth/me",
@@ -167,11 +168,8 @@ app.post(
   }
 );
 
-app.get("/streak", 
-      authenticateToken, 
-      async(req: Request, res: Response) => {
-
-  try { 
+app.get("/streak", authenticateToken, async (req: Request, res: Response) => {
+  try {
     // get the streak
 
     const userId = res.locals.userId;
@@ -179,10 +177,9 @@ app.get("/streak",
 
     res.json(streak);
   } catch (error: any) {
-
     res.json("Error");
   }
-})
+});
 
 // LEVELS ROUTE
 app.post(
