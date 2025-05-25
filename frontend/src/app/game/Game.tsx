@@ -94,7 +94,7 @@ export default function Game() {
       <nav className="absolute top-0 flex justify-between p-4 w-full">
         {/* TODO: Left section of Navbar */}
         <div className="flex gap-2 items-center">
-          <SimpleBox />
+          
           <AvatarOptions
             avatar={avatar}
             setAvatar={setAvatar}
@@ -107,6 +107,7 @@ export default function Game() {
               (user?.backgroundUnlocked as BackgroundName[]) || []
             }
           />
+          <SimpleBox />
           <LevelMenu user={user} />
         </div>
         {/* TODO: Right section of Navbar */}
