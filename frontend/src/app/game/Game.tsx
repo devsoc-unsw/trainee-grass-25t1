@@ -9,6 +9,7 @@ import LevelMenu from "./components/huds/LevelMenu";
 import LeaderboardDialog from "./components/huds/leaderboard/LeaderboardDialog";
 import useAuth from "@/hooks/useAuth";
 import UserProfile from "./components/huds/UserProfile";
+import SimpleBox from "./components/huds/streaks";
 
 export default function Game() {
   // States
@@ -93,6 +94,7 @@ export default function Game() {
       <nav className="absolute top-0 flex justify-between p-4 w-full">
         {/* TODO: Left section of Navbar */}
         <div className="flex gap-2 items-center">
+          
           <AvatarOptions
             avatar={avatar}
             setAvatar={setAvatar}
@@ -105,6 +107,7 @@ export default function Game() {
               (user?.backgroundUnlocked as BackgroundName[]) || []
             }
           />
+          <SimpleBox />
           <LevelMenu user={user} />
         </div>
         {/* TODO: Right section of Navbar */}

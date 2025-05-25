@@ -1,12 +1,12 @@
 // Server imports
-import express, { Request, Response, NextFunction } from "express";
+import express, { Request, Response, NextFunction, response } from "express";
 import morgan from "morgan";
 import errorHandler from "middleware-http-errors";
 import cors from "cors";
 import "dotenv/config";
 import cookieParser from "cookie-parser";
 import { PrismaClient } from "@prisma/client";
-import { Server } from "http";
+import { request, Server } from "http";
 import jwt, { JwtPayload } from "jsonwebtoken";
 
 // Helper functions
@@ -15,6 +15,7 @@ import { deleteToken, generateToken } from "./helper/tokenHelper";
 // Route imports
 import { signIn } from "./auth/signin";
 import { authLogout } from "./auth/logout";
+import { getStreakCounter } from "./userInfos/userStreak";
 import { syncUserProgress } from "./levels/syncUserProgress";
 import { getLeaderboard } from "./leaderboard/getLeaderboard";
 import { upsertSprites } from "./helper/spriteHelper";
@@ -166,6 +167,23 @@ app.post(
   }
 );
 
+app.get("/streak", 
+      authenticateToken, 
+      async(req: Request, res: Response) => {
+
+  try { 
+    // get the streak
+
+    const userId = res.locals.userId;
+    const streak = await getStreakCounter(userId);
+
+    res.json(streak);
+  } catch (error: any) {
+
+    res.json("Error");
+  }
+})
+
 // LEVELS ROUTE
 app.post(
   "/sync-progress",
@@ -193,7 +211,6 @@ app.get(
   ) => {
     try {
       const userId = res.locals.userId;
-
       // Parse query parameters
       const page = req.query.page
         ? Math.max(1, parseInt(req.query.page, 10))
