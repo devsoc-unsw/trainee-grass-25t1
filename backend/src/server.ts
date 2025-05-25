@@ -13,13 +13,18 @@ import jwt, { JwtPayload } from "jsonwebtoken";
 import { deleteToken, generateToken } from "./helper/tokenHelper";
 
 // Route imports
-import { authRegister } from "./auth/register";
+import { signIn } from "./auth/signin";
 import { authLogout } from "./auth/logout";
 import { getStreakCounter } from "./userInfos/userStreak";
 import { syncUserProgress } from "./levels/syncUserProgress";
 import { getLeaderboard } from "./leaderboard/getLeaderboard";
 import { upsertSprites } from "./helper/spriteHelper";
-import { getUserById } from "./helper/userHelper";
+import {
+  getUserById,
+  updateUserAvatar,
+  updateUserBackground,
+} from "./helper/userHelper";
+import { AVATARS, BACKGROUNDS } from "./constants/sprites";
 
 // Database client
 const prisma = new PrismaClient();
@@ -57,7 +62,7 @@ app.get("/", async (req: Request, res: Response) => {
 
 // AUTH ROUTES
 app.post(
-  "/auth/register",
+  "/auth/signin",
   async (req: Request, res: Response): Promise<any> => {
     try {
       const { leetcodeSessionCookie } = req.body;
@@ -66,7 +71,7 @@ app.post(
           .status(400)
           .json({ error: "LeetCode session cookie required." });
       }
-      const { token, user } = await authRegister(leetcodeSessionCookie);
+      const { token, user } = await signIn(leetcodeSessionCookie);
 
       // Assign cookies
       res.cookie("accessToken", (await token).accessToken, {
@@ -219,6 +224,70 @@ app.get(
       res.status(200).json(leaderboard);
     } catch (error: any) {
       console.error(error);
+      res
+        .status(error.status || 500)
+        .json({ error: error.message || "An error occurred." });
+    }
+  }
+);
+
+// SPRITES ROUTE
+app.post(
+  "/user/avatar",
+  authenticateToken,
+  async (req: Request, res: Response) => {
+    try {
+      const { avatar } = req.body;
+      if (!avatar) {
+        res.status(400).json({ error: "Avatar is required on the body." });
+        return;
+      }
+
+      if (avatar && !AVATARS.map((avatar) => avatar.name).includes(avatar)) {
+        res.status(400).json({ error: "Invalid avatar name." });
+        return;
+      }
+
+      const userId = res.locals.userId;
+      await updateUserAvatar(userId, avatar);
+
+      const updatedUser = await getUserById(userId);
+      res.status(200).json(updatedUser);
+    } catch (error: any) {
+      console.error("Error updating sprites:", error);
+      res
+        .status(error.status || 500)
+        .json({ error: error.message || "An error occurred." });
+    }
+  }
+);
+
+app.post(
+  "/user/background",
+  authenticateToken,
+  async (req: Request, res: Response) => {
+    try {
+      const { background } = req.body;
+      if (!background) {
+        res.status(400).json({ error: "Avatar or background are required." });
+        return;
+      }
+
+      if (
+        background &&
+        !BACKGROUNDS.map((background) => background.name).includes(background)
+      ) {
+        res.status(400).json({ error: "Invalid background name." });
+        return;
+      }
+
+      const userId = res.locals.userId;
+      await updateUserBackground(userId, background);
+
+      const updatedUser = await getUserById(userId);
+      res.status(200).json(updatedUser);
+    } catch (error: any) {
+      console.error("Error updating sprites:", error);
       res
         .status(error.status || 500)
         .json({ error: error.message || "An error occurred." });
