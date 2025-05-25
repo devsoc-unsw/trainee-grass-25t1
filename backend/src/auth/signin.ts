@@ -25,7 +25,7 @@ export type UserResponse = {
   backgroundUnlocked: string[];
 };
 
-export async function authRegister(leetcodeSessionCookie: string) {
+export async function signIn(leetcodeSessionCookie: string) {
   const userData = await getUserAndStoreStats(leetcodeSessionCookie);
 
   if (!userData) {

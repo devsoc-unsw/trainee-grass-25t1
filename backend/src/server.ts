@@ -13,7 +13,7 @@ import jwt, { JwtPayload } from "jsonwebtoken";
 import { deleteToken, generateToken } from "./helper/tokenHelper";
 
 // Route imports
-import { authRegister } from "./auth/register";
+import { signIn } from "./auth/signin";
 import { authLogout } from "./auth/logout";
 import { syncUserProgress } from "./levels/syncUserProgress";
 import { getLeaderboard } from "./leaderboard/getLeaderboard";
@@ -61,7 +61,7 @@ app.get("/", async (req: Request, res: Response) => {
 
 // AUTH ROUTES
 app.post(
-  "/auth/register",
+  "/auth/signin",
   async (req: Request, res: Response): Promise<any> => {
     try {
       const { leetcodeSessionCookie } = req.body;
@@ -70,7 +70,7 @@ app.post(
           .status(400)
           .json({ error: "LeetCode session cookie required." });
       }
-      const { token, user } = await authRegister(leetcodeSessionCookie);
+      const { token, user } = await signIn(leetcodeSessionCookie);
 
       // Assign cookies
       res.cookie("accessToken", (await token).accessToken, {
