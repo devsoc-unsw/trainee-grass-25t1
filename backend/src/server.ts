@@ -38,7 +38,7 @@ const httpServer = new Server(app);
 // Use middleware that allows for access from other domains
 app.use(
   cors({
-    origin: ["http://localhost:8080"],
+    origin: ["http://localhost:8080", "https://trainee-grass-25t1.vercel.app/"],
     credentials: true,
   })
 );
