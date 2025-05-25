@@ -49,8 +49,8 @@ app.use(
 
 // Constants
 const PORT: number = parseInt(process.env.PORT || "3000");
-const isProduction: boolean = process.env.NODE_ENV === "production";
-const COOKIES_DOMAIN = isProduction ? "" : ".localhost"; // TODO: COOKIES DOMAIN FOR DEPLOYMENT
+const isProduction = process.env.NODE_ENV === "production";
+const COOKIES_DOMAIN = isProduction ? undefined : ".localhost";
 const DEFAULT_PAGE_NUMBER = 1;
 const DEFAULT_PAGE_SIZE = 5;
 
@@ -81,7 +81,7 @@ app.post("/auth/signin", async (req: Request, res: Response): Promise<any> => {
       path: "/",
       secure: isProduction,
       domain: COOKIES_DOMAIN,
-      sameSite: isProduction ? "none" : "lax",
+      sameSite: isProduction ? "strict" : "lax",
       maxAge: 1800000,
     });
     res.cookie("refreshToken", (await token).refreshToken, {
@@ -89,7 +89,7 @@ app.post("/auth/signin", async (req: Request, res: Response): Promise<any> => {
       path: "/",
       secure: isProduction,
       domain: COOKIES_DOMAIN,
-      sameSite: isProduction ? "none" : "lax",
+      sameSite: isProduction ? "strict" : "lax",
       maxAge: 7776000000,
     });
 
@@ -384,7 +384,7 @@ async function authenticateToken(
           path: "/",
           secure: isProduction,
           domain: COOKIES_DOMAIN,
-          sameSite: isProduction ? "none" : "lax",
+          sameSite: isProduction ? "strict" : "lax",
           maxAge: 1800000,
         });
         res.cookie("refreshToken", newTokens.refreshToken, {
@@ -392,7 +392,7 @@ async function authenticateToken(
           path: "/",
           secure: isProduction,
           domain: COOKIES_DOMAIN,
-          sameSite: isProduction ? "none" : "lax",
+          sameSite: isProduction ? "strict" : "lax",
           maxAge: 7776000000,
         });
 
