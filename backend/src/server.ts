@@ -38,7 +38,11 @@ const httpServer = new Server(app);
 // Use middleware that allows for access from other domains
 app.use(
   cors({
-    origin: ["http://localhost:8080", "https://leetcraft.dev"],
+    origin: [
+      "http://localhost:8080",
+      "https://leetcraft.dev",
+      "https://www.leetcraft.dev",
+    ],
     credentials: true,
   })
 );
@@ -77,7 +81,7 @@ app.post("/auth/signin", async (req: Request, res: Response): Promise<any> => {
       path: "/",
       secure: isProduction,
       domain: COOKIES_DOMAIN,
-      sameSite: isProduction ? "strict" : "lax",
+      sameSite: isProduction ? "none" : "lax",
       maxAge: 1800000,
     });
     res.cookie("refreshToken", (await token).refreshToken, {
@@ -85,7 +89,7 @@ app.post("/auth/signin", async (req: Request, res: Response): Promise<any> => {
       path: "/",
       secure: isProduction,
       domain: COOKIES_DOMAIN,
-      sameSite: isProduction ? "strict" : "lax",
+      sameSite: isProduction ? "none" : "lax",
       maxAge: 7776000000,
     });
 
@@ -380,7 +384,7 @@ async function authenticateToken(
           path: "/",
           secure: isProduction,
           domain: COOKIES_DOMAIN,
-          sameSite: isProduction ? "strict" : "lax",
+          sameSite: isProduction ? "none" : "lax",
           maxAge: 1800000,
         });
         res.cookie("refreshToken", newTokens.refreshToken, {
@@ -388,7 +392,7 @@ async function authenticateToken(
           path: "/",
           secure: isProduction,
           domain: COOKIES_DOMAIN,
-          sameSite: isProduction ? "strict" : "lax",
+          sameSite: isProduction ? "none" : "lax",
           maxAge: 7776000000,
         });
 
